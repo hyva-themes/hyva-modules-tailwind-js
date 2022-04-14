@@ -1,0 +1,21 @@
+{
+  "name": "@hyva-themes/hyva-modules",
+  "version": "1.0.0",
+  "homepage": "https://hyva.io",
+  "bugs": {
+    "email": "info@hyva.io"
+  },
+  "description": "Hyvä-themes TailwindCSS utility functions",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hyva-themes/hyva-modules-tailwind-js.git"
+  },
+  "devDependencies": {
+    "jest": "^27.5.1"
+  }
+}
