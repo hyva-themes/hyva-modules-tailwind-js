@@ -17,5 +17,8 @@
   },
   "devDependencies": {
     "jest": "^27.5.1"
+  },
+  "dependencies": {
+    "deepmerge": "^4.2.2"
   }
 }
