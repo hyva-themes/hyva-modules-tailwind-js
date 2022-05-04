@@ -26,7 +26,7 @@ global.themeDirRequire = `${tailwindDir}/node_modules`
  * Set the purge content as absolute paths on configClone in targetVersion structure
  */
 function copyPurgeContentInTargetVersion(targetVersion, extensionConfig, configClone, pathToModule) {
-    const pathsInModule = extensionConfig.purge?.content
+    const pathsInModule = extensionConfig.purge && extensionConfig.purge.content
         ? extensionConfig.purge.content
         : (extensionConfig.content ?? []);
 
@@ -50,7 +50,7 @@ function copyPurgeContentInTargetVersion(targetVersion, extensionConfig, configC
  * Set the extensionConfig safelist on configClone in targetVersion structure
  */
 function copySafelistInTargetVersion(targetVersion, extensionConfig, configClone) {
-    const safelist = extensionConfig.purge?.safelist
+    const safelist = extensionConfig.purge && extensionConfig.purge.safelist
         ? extensionConfig.purge.safelist
         : (extensionConfig.safelist ?? []);
 
