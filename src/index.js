@@ -28,7 +28,7 @@ global.themeDirRequire = `${tailwindDir}/node_modules`
 function copyPurgeContentInTargetVersion(targetVersion, extensionConfig, configClone, pathToModule) {
     const pathsInModule = extensionConfig.purge && extensionConfig.purge.content
         ? extensionConfig.purge.content
-        : (extensionConfig.content ?? []);
+        : (extensionConfig.content || []);
 
     if (pathsInModule.length === 0) {
         return;
@@ -52,7 +52,7 @@ function copyPurgeContentInTargetVersion(targetVersion, extensionConfig, configC
 function copySafelistInTargetVersion(targetVersion, extensionConfig, configClone) {
     const safelist = extensionConfig.purge && extensionConfig.purge.safelist
         ? extensionConfig.purge.safelist
-        : (extensionConfig.safelist ?? []);
+        : (extensionConfig.safelist || []);
 
     if (safelist.length === 0) {
         return;
