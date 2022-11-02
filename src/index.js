@@ -149,7 +149,7 @@ const postcssImportHyvaModules = ((opts = {}) => {
                 if (fs.existsSync(moduleTailwindSourceCss)) {
                     const importRule = new postcss.AtRule({name: 'import', params: `"${moduleTailwindSourceCss}"`});
                     importRule.source = root.source;
-                    root.append(importRule);
+                    root.prepend(importRule);
                 }
             });
         }
