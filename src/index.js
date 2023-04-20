@@ -190,15 +190,14 @@ const postcssImportHyvaModules = (opts = {}) => {
     const moduleDirs = includeDirs.filter(
         (value) => !exludeDirs.includes(value)
     );
+    const cssPath = "view/frontend/tailwind/tailwind-source.css";
 
     return {
         postcssPlugin: "hyva-postcss-in-modules",
         Once(root, postcss) {
-                    const moduleTailwindSourceCss = path.join(
-                        moduleDir,
-                        "view/frontend/tailwind/tailwind-source.css"
-                    );
             moduleDirs.forEach((moduleDir) => {
+                const moduleTailwindSourceCss = path.join(moduleDir, cssPath);
+
                 if (fs.existsSync(moduleTailwindSourceCss)) {
                     const importRule = new postcss.AtRule({
                         name: "import",
