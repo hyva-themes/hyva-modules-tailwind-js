@@ -181,10 +181,10 @@ function mergeTailwindConfig(baseConfig) {
 }
 
 const postcssImportHyvaModules = (opts = {}) => {
+    const includeDirs = opts.hyvaModuleDirs || hyvaModuleDirs || [];
     return {
         postcssPlugin: "hyva-postcss-in-modules",
         Once(root, postcss) {
-            (opts.hyvaModuleDirs || hyvaModuleDirs || []).forEach(
                 (moduleDir) => {
                     const moduleTailwindSourceCss = path.join(
                         moduleDir,
