@@ -74,9 +74,7 @@ function copySafelistInTargetVersion(
             ? extensionConfig.purge.safelist
             : extensionConfig.safelist || [];
 
-    if (safelist.length === 0) {
-        return;
-    }
+    if (safelist.length === 0) return;
 
     // Set safelist in target version configuration structure
     if (targetVersion === "v3") {
