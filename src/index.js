@@ -201,6 +201,7 @@ const postcssImportHyvaModules = (opts = {}) => {
         },
     };
 };
+
 postcssImportHyvaModules.postcss = true;
 
 // For testing
