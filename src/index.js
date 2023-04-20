@@ -182,24 +182,33 @@ function mergeTailwindConfig(baseConfig) {
 
 const postcssImportHyvaModules = (opts = {}) => {
     const includeDirs = opts.hyvaModuleDirs || hyvaModuleDirs || [];
+    const exludeDirs = opts.excludeDirs
+        ? Object.values(opts.excludeDirs).map((module) =>
+              path.join(basePath, module)
+          )
+        : [];
+    const moduleDirs = includeDirs.filter(
+        (value) => !exludeDirs.includes(value)
+    );
+
     return {
         postcssPlugin: "hyva-postcss-in-modules",
         Once(root, postcss) {
-                (moduleDir) => {
                     const moduleTailwindSourceCss = path.join(
                         moduleDir,
                         "view/frontend/tailwind/tailwind-source.css"
                     );
-                    if (fs.existsSync(moduleTailwindSourceCss)) {
-                        const importRule = new postcss.AtRule({
-                            name: "import",
-                            params: `"${moduleTailwindSourceCss}"`,
-                        });
-                        importRule.source = root.source;
-                        root.append(importRule);
-                    }
+            moduleDirs.forEach((moduleDir) => {
+                if (fs.existsSync(moduleTailwindSourceCss)) {
+                    const importRule = new postcss.AtRule({
+                        name: "import",
+                        params: `"${moduleTailwindSourceCss}"`,
+                    });
+
+                    importRule.source = root.source;
+                    root.append(importRule);
                 }
-            );
+            });
         },
     };
 };
