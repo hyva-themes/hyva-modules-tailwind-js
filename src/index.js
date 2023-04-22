@@ -136,12 +136,21 @@ const hyvaThemesConfig = basePath
     ? JSON.parse(fs.readFileSync(path.join(basePath, hyvaThemeJsonInModule)))
     : "";
 
+/**
+ * Add the full path to each path in a array
+ *
+ * @param {string[]} paths - to add the basePath to
+ * @param {string} subPath - subpath from paths to use
+ * @returns string[] | []
+ */
+function setFullPaths(paths, subPath = "") {
+    return Object.values(paths || []).map((module) =>
+        path.join(basePath, subPath ? module[subPath] : module)
+    );
+}
+
 const hyvaModuleDirs =
-    hyvaThemesConfig && hyvaThemesConfig.extensions
-        ? Object.values(hyvaThemesConfig.extensions || []).map((module) =>
-              path.join(basePath, module.src)
-          )
-        : [];
+    hyvaThemesConfig && setFullPaths(hyvaThemesConfig.extensions, "src");
 
 function mergeTailwindConfig(baseConfig) {
     if (!basePath) {
@@ -191,12 +200,11 @@ function mergeTailwindConfig(baseConfig) {
  * @returns {Object} PostCSS plugin object.
  */
 const postcssImportHyvaModules = (opts = {}) => {
-    const includeDirs = opts.hyvaModuleDirs || hyvaModuleDirs || [];
-    const exludeDirs = opts.excludeDirs
-        ? Object.values(opts.excludeDirs).map((module) =>
-              path.join(basePath, module)
-          )
-        : [];
+    const includeDirs =
+        (opts.hyvaModuleDirs && setFullPaths(opts.hyvaModuleDirs)) ||
+        hyvaModuleDirs ||
+        [];
+    const exludeDirs = setFullPaths(opts.excludeDirs);
     const moduleDirs = includeDirs.filter(
         (value) => !exludeDirs.includes(value)
     );
