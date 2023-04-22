@@ -185,8 +185,8 @@ function mergeTailwindConfig(baseConfig) {
  *
  * @typedef {Object} PostCSSPlugin
  * @param {Object} opts - Options object.
- * @param {Array} [opts.hyvaModuleDirs=[]] - Array of directories to search for Hyva modules.
- * @param {Array} [opts.excludeDirs=[]] - Array of directories to exclude.
+ * @param {Array} [opts.hyvaModuleDirs=[]] - Directories to search for Hyva modules.
+ * @param {Array} [opts.excludeDirs=[]] - Directories to exclude.
  * @returns {Object} PostCSS plugin object.
  */
 const postcssImportHyvaModules = (opts = {}) => {
