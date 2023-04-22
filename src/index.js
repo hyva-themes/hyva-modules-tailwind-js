@@ -131,9 +131,10 @@ function mergeExtensionConfig(
     return deepmerge(mergeTarget, toMerge);
 }
 
+/** @type {string} */
 const hyvaThemesConfig = basePath
     ? JSON.parse(fs.readFileSync(path.join(basePath, hyvaThemeJsonInModule)))
-    : false;
+    : "";
 
 const hyvaModuleDirs =
     hyvaThemesConfig && hyvaThemesConfig.extensions
