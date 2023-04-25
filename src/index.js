@@ -23,6 +23,7 @@ const basePath = (function findBaseDirPath(dir) {
 })(cwd())
 
 const hyvaThemeJsonInModule = 'app/etc/hyva-themes.json';
+
 const tailwindDir = cwd();
 
 // Global variable with prefix to use inside extensions tailwind.config.js file to require installed node modules.
