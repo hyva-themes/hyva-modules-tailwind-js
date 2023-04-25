@@ -18,5 +18,5 @@ trim_trailing_whitespace = false
 max_line_length = 80
 
 [*.{js,cjs}]
-indent_size = 4
+indent_size = 2
 max_line_length = 80
