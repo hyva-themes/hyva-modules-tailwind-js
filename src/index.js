@@ -7,7 +7,7 @@
 const deepmerge = require('deepmerge');
 const fs = require('fs');
 const path = require('path');
-const { cwd } = require('process');
+const {cwd} = require('process');
 
 // Determine Magento base dir by searching for parent dir containing an app/ and a vendor/ folder
 const basePath = (function findBaseDirPath(dir) {
@@ -57,10 +57,9 @@ function copyPurgeContentInTargetVersion(targetVersion, extensionConfig, configC
  * Set the extensionConfig safelist on configClone in targetVersion structure
  */
 function copySafelistInTargetVersion(targetVersion, extensionConfig, configClone) {
-  const safelist =
-    extensionConfig.purge && extensionConfig.purge.safelist
+  const safelist = extensionConfig.purge && extensionConfig.purge.safelist
       ? extensionConfig.purge.safelist
-      : extensionConfig.safelist || [];
+      : (extensionConfig.safelist || []);
 
   if (safelist.length === 0) {
     return;
@@ -76,13 +75,14 @@ function copySafelistInTargetVersion(targetVersion, extensionConfig, configClone
 }
 
 function buildModuleConfigForVersion(targetVersion, extensionConfig, modulePath) {
+
   // Use a clone of the config object to avoid deepmerge concatenating the arrays multiple times.
   // The reason is require(moduleConfigFile) always returns the same instance on multiple calls,
   // and mutating it is a lasting side effect that affects the return value of subsequent
   // require() calls for the same file.
 
   // Create shallow clone of extensionConfig without content, safelist and purge
-  const { content, safelist, purge, ...configClone } = extensionConfig;
+  const {content, safelist, purge, ...configClone} = extensionConfig;
 
   copyPurgeContentInTargetVersion(targetVersion, extensionConfig, configClone, modulePath);
   copySafelistInTargetVersion(targetVersion, extensionConfig, configClone);
@@ -102,7 +102,9 @@ function mergeExtensionConfig(targetVersion, mergeTarget, extensionConfig, modul
 }
 
 /** @type {string} */
-const hyvaThemesConfig = basePath ? JSON.parse(fs.readFileSync(path.join(basePath, hyvaThemeJsonInModule))) : '';
+const hyvaThemesConfig = basePath
+  ? JSON.parse(fs.readFileSync(path.join(basePath, hyvaThemeJsonInModule)))
+  : '';
 
 /**
  * Add the full path to each path in a array
@@ -118,6 +120,7 @@ function setFullPaths(paths, subPath = '') {
 const hyvaModuleDirs = hyvaThemesConfig && setFullPaths(hyvaThemesConfig.extensions, 'src');
 
 function mergeTailwindConfig(baseConfig) {
+
   if (!basePath) {
     // Since this is a new feature, we're not gonna display any error messages.
     // console.log(
@@ -178,7 +181,7 @@ const postcssImportHyvaModules = (opts = {}) => {
           root.append(importRule);
         }
       });
-    },
+    }
   };
 };
 postcssImportHyvaModules.postcss = true;
@@ -194,5 +197,5 @@ module.exports = {
   // Parsed contents of the app/etc/hyva-themes.json file (or false)
   hyvaThemesConfig,
   // Array of absolute paths to Hyvä modules
-  hyvaModuleDirs,
+  hyvaModuleDirs
 };
