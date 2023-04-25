@@ -162,8 +162,8 @@ function mergeTailwindConfig(baseConfig) {
  */
 const postcssImportHyvaModules = (opts = {}) => {
   const includeDirs = (opts.hyvaModuleDirs && setFullPaths(opts.hyvaModuleDirs)) || hyvaModuleDirs || [];
-  const exludeDirs = setFullPaths(opts.excludeDirs);
-  const moduleDirs = includeDirs.filter((value) => !exludeDirs.includes(value));
+  const excludeDirs = setFullPaths(opts.excludeDirs);
+  const moduleDirs = includeDirs.filter((value) => !excludeDirs.includes(value));
   const cssPath = 'view/frontend/tailwind/tailwind-source.css';
 
   return {
