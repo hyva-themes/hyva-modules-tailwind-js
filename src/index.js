@@ -182,7 +182,7 @@ const postcssImportHyvaModules = (opts = {}) => {
         }
       });
     }
-  };
+  }
 };
 postcssImportHyvaModules.postcss = true;
 
@@ -198,4 +198,4 @@ module.exports = {
   hyvaThemesConfig,
   // Array of absolute paths to Hyvä modules
   hyvaModuleDirs
-};
+}
