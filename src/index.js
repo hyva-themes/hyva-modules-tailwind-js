@@ -102,10 +102,10 @@ function mergeExtensionConfig(targetVersion, mergeTarget, extensionConfig, modul
   return deepmerge(mergeTarget, toMerge);
 }
 
-/** @type {string} */
+/** @type {Object|boolean} */
 const hyvaThemesConfig = basePath
   ? JSON.parse(fs.readFileSync(path.join(basePath, hyvaThemeJsonInModule)))
-  : '';
+  : false;
 
 /**
  * Add the full path to each path in a array
