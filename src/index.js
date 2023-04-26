@@ -111,11 +111,11 @@ const hyvaThemesConfig = basePath
  * Add the full path to each path in a array
  *
  * @param {string[]} paths - to add the basePath to
- * @param {string} subPath - subpath from paths to use
+ * @param {string} key - key from paths to use
  * @returns string[] | []
  */
-function setFullPaths(paths, subPath = '') {
-  return Object.values(paths || []).map((module) => path.join(basePath, subPath ? module[subPath] : module));
+function setFullPaths(paths, key = '') {
+  return Object.values(paths || []).map((module) => path.join(basePath, key ? module[key] : module));
 }
 
 const hyvaModuleDirs = hyvaThemesConfig && setFullPaths(hyvaThemesConfig.extensions, 'src');
