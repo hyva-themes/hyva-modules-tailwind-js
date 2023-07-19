@@ -11,15 +11,15 @@ const {cwd} = require('process');
 
 // Determine Magento base dir by searching for parent dir containing an app/ and a vendor/ folder
 const basePath = (function findBaseDirPath(dir) {
+  const isBaseDir = fs.existsSync(path.join(dir, 'app')) && fs.existsSync(path.join(dir, 'vendor'))
   const bp = path.join(dir, '..')
-  const isBaseDir = fs.existsSync(path.join(bp, 'app')) && fs.existsSync(path.join(bp, 'vendor'))
 
   // FS root?
   if (path.normalize(bp) === path.normalize(dir)) {
     return false;
   }
 
-  return isBaseDir ? bp : findBaseDirPath(bp);
+  return isBaseDir ? dir : findBaseDirPath(bp);
 })(cwd())
 
 const hyvaThemeJsonInModule = 'app/etc/hyva-themes.json';
