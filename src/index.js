@@ -115,7 +115,13 @@ const hyvaThemesConfig = basePath
  * @returns string[] | []
  */
 function setFullPaths(paths, key = '') {
-  return Object.values(paths || []).map((module) => path.join(basePath, key ? module[key] : module));
+    return Object.values(paths || []).map((module) => {
+    const modulePath = key ? module[key] : module;
+    if (fs.existsSync(modulePath)) {
+      return modulePath;
+    }
+    return path.join(basePath, modulePath)
+  });
 }
 
 const hyvaModuleDirs = hyvaThemesConfig && setFullPaths(hyvaThemesConfig.extensions, 'src');
