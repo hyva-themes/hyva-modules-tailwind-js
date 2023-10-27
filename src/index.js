@@ -140,6 +140,7 @@ function mergeTailwindConfig(baseConfig) {
     const moduleConfigFile = path.join(modulePath, 'view/frontend/tailwind/tailwind.config.js');
 
     if (fs.existsSync(moduleConfigFile)) {
+      console.log('Including ' + moduleConfigFile);
       const extensionConfig = require(moduleConfigFile)
 
       // Merge the tailwind configuration from modules
