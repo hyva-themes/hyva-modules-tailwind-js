@@ -140,13 +140,15 @@ function mergeTailwindConfig(baseConfig) {
     const moduleConfigFile = path.join(modulePath, 'view/frontend/tailwind/tailwind.config.js');
 
     if (fs.existsSync(moduleConfigFile)) {
-      console.log('Including ' + moduleConfigFile);
+      !process.env.FIRST_RUN && console.log('Including ' + moduleConfigFile);
       const extensionConfig = require(moduleConfigFile)
 
       // Merge the tailwind configuration from modules
       mergeConfig = mergeExtensionConfig(targetTailwindVersion, mergeConfig, extensionConfig, modulePath)
     }
   }
+
+  process.env.FIRST_RUN = 1;
 
   // Merge theme config last so it takes precedence over all module configurations
   return deepmerge(mergeConfig, baseConfig)
