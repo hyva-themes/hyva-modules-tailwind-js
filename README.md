@@ -26,7 +26,7 @@ Before using the library, install it inside your Hyvä-Theme folder using
 npm install @hyva-themes/hyva-modules
 ```
 
-> [!INFO]
+> [!NOTE]
 > If you are using Hyvä 1.1.14 or newer it will already be included in the `package.json` file by default.
 
 ### Merging module tailwind configurations
