@@ -2,7 +2,6 @@
 
 Hyvä-themes TailwindCSS utility functions.
 
-
 ## Library module exports:
 
 * `mergeTailwindConfig`  
@@ -34,18 +33,19 @@ To use the tailwind config merging, require this module in a themes' `tailwind.c
 a call to `mergeTailwindConfig()` like this:
 
 ```js
-const hyvaModules = require('@hyva-themes/hyva-modules');
-module.exports = hyvaModules.mergeTailwindConfig({
+const { mergeTailwindConfig } = require('@hyva-themes/hyva-modules');
+
+module.exports = mergeTailwindConfig({
   // theme tailwind config here ...
 })
 ```
+
 #### Specifying content (purge) paths
 
-* **How do I specify relative purge paths content paths?**  
+* **How do I specify relative purge paths content paths?**
   Specify the paths relative to the `view/frontend/tailwind/tailwind.config.js` file in the module, for example `../templates/**/*.phtml`
-
-* **Do I use the TailwindCSS v2 or v3 purge content structure?**  
-  The script is smart enough to map a modules' purge config structure to the same one that is used in the theme.  
+* **Do I use the TailwindCSS v2 or v3 purge content structure?**
+  The script is smart enough to map a modules' purge config structure to the same one that is used in the theme.
   If you don't have any preference, then we suggest you use the v3 structure.
 
 #### Using `require()`
@@ -58,7 +58,6 @@ const colors = require(`${themeDirRequire}/tailwindcss/colors`);
 
 The global variable `themeDirRequire` maps to the `node_modules/` folder in the theme that is currently being built.
 
-
 ### Merging module tailwind CSS
 
 To use the hyva-modules postcss plugin, require this library and add it as the first plugin in the themes'
@@ -66,42 +65,45 @@ To use the hyva-modules postcss plugin, require this library and add it as the f
 
 ```js
 const { postcssImportHyvaModules } = require('@hyva-themes/hyva-modules');
-  module.exports = {
+
+module.exports = {
     plugins: [
-     postcssImportHyvaModules,
-     require('postcss-import'),
-     ...other plugins...
- ]
+        postcssImportHyvaModules,
+        require('postcss-import'),
+        ...other PostCSS plugins...
+    ]
 }
 ```
+
 #### Creating a modules' `tailwind-source.css` file
 
 To declare custom CSS, create a file `view/frontend/tailwind/tailwind-source.css` in a module.
-This file will automatically be imported with `@import` at the end of a themes' `tailwind-source.css` file.  
+This file will automatically be imported with `@import` at the end of a themes' `tailwind-source.css` file.
 
-We recommend only using `@import` statements in a module `tailwind-source.css` file, since other modules CSS files might be appended afterwards, and `@import` statements are only allowed before regular CSS declarations. 
+We recommend only using `@import` statements in a module `tailwind-source.css` file,
+since other modules CSS files might be appended afterwards,
+and `@import` statements are only allowed before regular CSS declarations.
 
 
 ### The `hyvaThemesConfig` and `hyvaModuleDirs` exports
 
 These values are intended to be used in custom build tools and in future utilities.
 
-
 ## The `hyva-themes.json` configuration
 
 This library uses the file `app/etc/hyva-themes.json` to know which modules might contain tailwind configuration or CSS to merge.
-This file is generate by the CLI command `bin/magento hyva:config:generate`.  
+This file is generate by the CLI command `bin/magento hyva:config:generate`.
 
-To add a module to the list, the Magento event `hyva_config_generate_before` can be used.  
-This happens automatically for Hyvä compatibility modules that register themselves with the `\Hyva\CompatModuleFallback\Model\CompatModuleRegistry`.
+To add a module to the list, the Magento event `hyva_config_generate_before` can be used.
+
+This happens automatically for Hyvä compatibility modules that register themselves with the `Hyva\CompatModuleFallback\Model\CompatModuleRegistry`.
 
 The `bin/magento hyva:config:generate` command should be run as part of the build, before `npm run build-prod`.
 
-
 ## License
 
-Hyvä Themes - https://hyva.io  
-Copyright © Hyvä Themes 2022-present. All rights reserved.  
-This library is distributed under the BSD-3-Clause license.  
+Hyvä Themes - https://hyva.io
+Copyright © Hyvä Themes 2022-present. All rights reserved.
+This library is distributed under the BSD-3-Clause license.
 
 See the [LICENSE.md](LICENSE.md) file for more information.
