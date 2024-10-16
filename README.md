@@ -105,7 +105,9 @@ The `bin/magento hyva:config:generate` command should be run as part of the buil
 ## License
 
 Hyvä Themes - https://hyva.io
+
 Copyright © Hyvä Themes 2022-present. All rights reserved.
+
 This library is distributed under the BSD-3-Clause license.
 
 See the [LICENSE.md](LICENSE.md) file for more information.
