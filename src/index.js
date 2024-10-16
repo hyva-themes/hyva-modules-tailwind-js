@@ -8,6 +8,7 @@ const deepmerge = require('deepmerge')
 const fs = require('fs')
 const path = require('path');
 const {cwd} = require('process');
+const { twVar, twProps } = require('./tailwind-css-props');
 
 // Determine Magento base dir by searching for parent dir containing an app/ and a vendor/ folder
 const basePath = (function findBaseDirPath(dir) {
@@ -195,5 +196,9 @@ module.exports = {
   // Parsed contents of the app/etc/hyva-themes.json file (or false)
   hyvaThemesConfig,
   // Array of absolute paths to Hyvä modules
-  hyvaModuleDirs
-}
+  hyvaModuleDirs,
+  // Function to add the new CSS variable syntax from Tailwind v4
+  twVar,
+  // Same as twVar but works for a objects as input
+  twProps
+};
