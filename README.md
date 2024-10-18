@@ -181,7 +181,7 @@ module.exports = mergeTailwindConfig({
 - `twProps` can be used on any level of your Tailwind config, but it only works with string values.
 - `twProps` is best used inside the [reference function method](https://tailwindcss.com/docs/theme#referencing-other-values).
 - You can use `Object.assign()` to split 2 groups inside any Tailwind config group, e.g. `colors`, so only one part gets the variables and the other part is left as is.
-- Both `twVar` and `twProps` have a prefix argument, this also highlighted when using Intelligence in your editor, powered trough JSDoc.
+- Both `twVar` and `twProps` have a prefix argument, this also highlighted when using Intellisense in your editor, powered trough JSDoc.
 
 ## The `hyva-themes.json` configuration
 
