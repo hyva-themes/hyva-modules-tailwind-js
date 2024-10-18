@@ -100,10 +100,9 @@ These values are intended to be used in custom build tools and in future utiliti
 
 ### How to add CSS variables to TailwindCSS using `twVar` and `twProps`
 
-In you Tailwind Config you can opt in to CSS variables with ease by using these functions,
-instead of adding all of the logic needed your self, these functions will handle this for you.
+You can opt into CSS variables in your tailwind configuration using the twVar and twProps function.
 
-with `twVar` you can add a CSS variable to one or more TailwindCSS tokens, for example like this:
+With `twVar` you can add a CSS variable to one or more TailwindCSS tokens, for example like this:
 
 ```js
 const { twVar, mergeTailwindConfig } = require('@hyva-themes/hyva-modules');
@@ -137,7 +136,7 @@ this will render any Tailwind color utility class with the following CSS value:
 > here they use the CSS function `color-mix()` to make this possible,
 > we have reused this to make that transition easier in the future.
 
-and with this you can change the value in your CSS or inline in the page with:
+And with this you can change the value in your CSS or inline in the page with:
 
 ```css
 :root {
@@ -146,8 +145,8 @@ and with this you can change the value in your CSS or inline in the page with:
 ```
 
 Now if you don't want to set this for each TailwindCSS token we also offer the functions `twProps`.
-This acts as a wrapper and will use the keys as the name for the CSS variable,
-if we use the same example we can create the same effect with less effort:
+This acts as a wrapper and will use the keys as the name for the CSS variable, so if the twProps wraps `primary > lighter` it will create the name `--primary-lighter`.
+In this example we can create the same effect as `twVar` with less effort:
 
 ```js
 const { twProps, mergeTailwindConfig } = require('@hyva-themes/hyva-modules');
