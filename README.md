@@ -1,10 +1,11 @@
-# Hyvä-Themes node-modules utility
+# Hyvä-Themes Node Modules utilities
 
-Hyvä-themes TailwindCSS utility functions.
+For Hyvä Themes with TailwindCSS we offer the following Node utility functions,
+that make it easier to mange and customize your theme styles.
 
 ## Library module exports:
 
-This Hyvä-themes TailwindCSS utility functions export the following function used in the following files:
+The follow functions are offered as an export:
 
 | Function name              | Used in              | Description                                                                                                          |
 | -------------------------- | -------------------- | -------------------------------------------------------------------------------------------------------------------- |
