@@ -6,7 +6,7 @@
 
 /**
  * Check if string looks like a color
- * This does not valid date if the color value is a valid color and does not support named colors
+ * This does not validate if the color value is a valid color and does not support named colors
  *
  * @param {string} value
  * @returns {boolean}
