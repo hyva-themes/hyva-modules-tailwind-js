@@ -22,8 +22,8 @@ Click the function name to read more about the function and how to use it in you
 [postcssImportHyvaModules]: #merging-module-tailwind-css
 [hyvaThemesConfig]: #the-hyvathemesconfig-and-hyvamoduledirs-exports
 [hyvaModuleDirs]: #the-hyvathemesconfig-and-hyvamoduledirs-exports
-[twVar]: #how-to-add-css-variables-to-tailwind-using-twvar-and-twprops
-[twProps]: #how-to-add-css-variables-to-tailwind-using-twvar-and-twprops
+[twVar]: #how-to-add-css-variables-to-tailwindcss-using-twvar-and-twprops
+[twProps]: #how-to-add-css-variables-to-tailwindcss-using-twvar-and-twprops
 
 ## How to use
 
