@@ -7,7 +7,7 @@
 const deepmerge = require('deepmerge')
 const fs = require('fs')
 const path = require('path');
-const {cwd} = require('process');
+const { cwd } = require('process');
 const { twVar, twProps } = require('./tailwind-css-props');
 
 // Determine Magento base dir by searching for parent dir containing an app/ and a vendor/ folder
