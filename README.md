@@ -150,7 +150,7 @@ This acts as a wrapper and will use the keys as the name for the CSS variable,
 if we use the same example we can create the same effect with less effort:
 
 ```js
-const { twVar, mergeTailwindConfig } = require('@hyva-themes/hyva-modules');
+const { twProps, mergeTailwindConfig } = require('@hyva-themes/hyva-modules');
 
 module.exports = mergeTailwindConfig({
     theme: {
