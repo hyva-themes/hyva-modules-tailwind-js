@@ -179,8 +179,68 @@ module.exports = mergeTailwindConfig({
 - `twVar` only works with string values.
 - `twProps` can be used on any level of your Tailwind config, but it only works with string values.
 - `twProps` is best used inside the [reference function method](https://tailwindcss.com/docs/theme#referencing-other-values).
-- You can use `Object.assign()` to split 2 groups inside any Tailwind config group, e.g. `colors`, so only one part gets the variables and the other part is left as is.
-- Both `twVar` and `twProps` have a prefix argument, this also highlighted when using Intellisense in your editor, powered trough JSDoc.
+
+#### How to only apply `twProps` as wrapper but don't apply it to all TailwindCSS tokens
+
+You can use `Object.assign()` to split 2 groups inside any Tailwind config group, e.g. `colors`,
+so only one part gets the variables and the other part is left as is.
+
+<details><summary>Code Sample</summary>
+
+```js
+const { twProps, mergeTailwindConfig } = require('@hyva-themes/hyva-modules');
+
+module.exports = mergeTailwindConfig({
+    theme: {
+        extend: {
+            colors: Object.assign(
+                twProps({
+                    primary: {
+                        lighter: colors.blue["600"],
+                        DEFAULT: colors.blue["700"],
+                        darker: colors.blue["800"],
+                    },
+                    secondary: {
+                        lighter: colors.blue["100"],
+                        DEFAULT: colors.blue["200"],
+                        darker: colors.blue["300"],
+                    },
+                }),
+                {
+                    background: {
+                        lighter: colors.blue["100"],
+                        DEFAULT: colors.blue["200"],
+                        darker: colors.blue["300"],
+                    },
+                    green: colors.emerald,
+                    yellow: colors.amber,
+                    purple: colors.violet,
+                }
+            ),
+        }
+    }
+    // The rest of your tailwind config...
+})
+```
+
+</details>
+
+#### `twVar` and `twProps` arguments
+
+```js
+twVar(
+    name, // Name of CSS variable
+    value, // (Optional) CSS variable fallback value
+    prefix, // (Optional) prefix for the name value, allows you to override the automically added 'color' prefix for color values
+);
+```
+
+```js
+twProps(
+    values, // The Object of TailwindCSS Tokens
+    prefix, // (Optional) prefix for the name values
+);
+```
 
 ## The `hyva-themes.json` configuration
 
