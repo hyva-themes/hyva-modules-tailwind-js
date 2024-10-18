@@ -197,7 +197,7 @@ module.exports = {
   hyvaThemesConfig,
   // Array of absolute paths to Hyvä modules
   hyvaModuleDirs,
-  // Function to add the new CSS variable syntax from Tailwind v4
+  // Function to add the CSS variable syntax from Tailwind v4
   twVar,
   // Same as twVar but works for a objects as input
   twProps
