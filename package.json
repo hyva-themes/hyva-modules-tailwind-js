@@ -1,27 +1,33 @@
 {
   "name": "@hyva-themes/hyva-modules",
   "version": "1.0.10",
-  "homepage": "https://hyva.io",
-  "bugs": {
-    "email": "info@hyva.io"
-  },
   "description": "Hyvä-themes TailwindCSS utility functions",
-  "main": "src/index.js",
-  "scripts": {
-    "test": "jest"
-  },
-  "license": "BSD-3-Clause",
+  "homepage": "https://hyva.io",
   "repository": {
     "type": "git",
     "url": "https://github.com/hyva-themes/hyva-modules-tailwind-js.git"
   },
-  "devDependencies": {
-    "jest": "^27.5.1"
+  "bugs": {
+    "url": "https://github.com/hyva-themes/hyva-modules-tailwind-js/issues",
+    "email": "info@hyva.io"
+  },
+  "license": "BSD-3-Clause",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "hyva",
+    "magento2",
+    "tailwindcss"
+  ],
+  "scripts": {
+    "test": "jest"
   },
   "dependencies": {
     "deepmerge": "^4.2.2"
   },
-  "engines" : {
-    "node" : ">=12.13.0"
+  "devDependencies": {
+    "jest": "^27.5.1"
   }
 }
