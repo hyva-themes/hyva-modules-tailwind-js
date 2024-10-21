@@ -6,12 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-[unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.9...HEAD
+[unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.10...HEAD
 
 No pending changes.
 
+## [1.0.10] - 2024-10-18
+[1.0.10]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.9...1.0.10
+
+### Fixed
+The 1.0.9 tag was on the wrong commit. Release 1.0.10 should reference the correct code version.
+
+
 ## [1.0.9] - 2024-10-18
-[1.0.9]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.7...1.0.8
+[1.0.9]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.8...1.0.9
 
 ### Added
 
