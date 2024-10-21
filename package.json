@@ -16,6 +16,11 @@
   "engines": {
     "node": ">=14.0.0"
   },
+  "keywords": [
+    "hyva",
+    "magento2",
+    "tailwindcss"
+  ],
   "scripts": {
     "test": "jest"
   },
