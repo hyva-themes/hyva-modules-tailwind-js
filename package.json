@@ -3,6 +3,7 @@
   "version": "1.0.9",
   "homepage": "https://hyva.io",
   "bugs": {
+    "url": "https://github.com/hyva-themes/hyva-modules-tailwind-js/issues",
     "email": "info@hyva.io"
   },
   "description": "Hyvä-themes TailwindCSS utility functions",
