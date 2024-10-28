@@ -1,7 +1,7 @@
 # Hyvä-Themes Node Modules utilities
 
 For Hyvä Themes with TailwindCSS we offer the following Node utility functions,
-that make it easier to mange and customize your theme styles.
+that make it easier to manage and customize your theme styles.
 
 ## Library module exports:
 
@@ -231,7 +231,7 @@ module.exports = mergeTailwindConfig({
 twVar(
     name, // Name of CSS variable
     value, // (Optional) CSS variable fallback value
-    prefix, // (Optional) prefix for the name value, allows you to override the automically added 'color' prefix for color values
+    prefix, // (Optional) prefix for the name value, allows you to override the automatically added 'color' prefix for color values
 );
 ```
 
