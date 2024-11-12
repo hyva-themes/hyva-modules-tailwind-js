@@ -205,7 +205,7 @@ module.exports = {
   mergeTailwindConfig,
   // Postcss plugin to add @import nodes for all tailwind-source.css files in modules
   postcssImportHyvaModules,
-  // Parsed contents of the app/etc/hyva-themes.json file (or false)
+  // Parsed contents of the app/etc/hyva-themes.json file
   hyvaThemesConfig,
   // Array of absolute paths to Hyvä modules
   hyvaModuleDirs,
