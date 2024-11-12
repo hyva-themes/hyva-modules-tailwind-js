@@ -4,16 +4,26 @@
  * This library is distributed under the BSD-3-Clause license.
  */
 
-const deepmerge = require('deepmerge')
-const fs = require('fs')
-const path = require('path');
-const { cwd } = require('process');
-const { twVar, twProps } = require('./tailwind-css-props');
+const deepmerge = require("deepmerge");
+const fs = require("fs");
+const path = require("path");
+const { cwd } = require("process");
+const { twVar, twProps } = require("./tailwind-css-props");
+
+// Console styles
+const cStyle = {
+  reset: "\x1B[0m",
+  success: "\x1B[32m",
+  warning: "\x1B[33m",
+  error: "\x1B[31m",
+};
 
 // Determine Magento base dir by searching for parent dir containing an app/ and a vendor/ folder
 const basePath = (function findBaseDirPath(dir) {
-  const isBaseDir = fs.existsSync(path.join(dir, 'app')) && fs.existsSync(path.join(dir, 'vendor'))
-  const bp = path.join(dir, '..')
+  const isBaseDir =
+    fs.existsSync(path.join(dir, "app")) &&
+    fs.existsSync(path.join(dir, "vendor"));
+  const bp = path.join(dir, "..");
 
   // FS root?
   if (path.normalize(bp) === path.normalize(dir)) {
@@ -21,33 +31,41 @@ const basePath = (function findBaseDirPath(dir) {
   }
 
   return isBaseDir ? dir : findBaseDirPath(bp);
-})(cwd())
+})(cwd());
 
-const hyvaThemeJsonInModule = 'app/etc/hyva-themes.json';
+const hyvaThemeJsonInModule = "app/etc/hyva-themes.json";
 
 const tailwindDir = cwd();
 
 // Global variable with prefix to use inside extensions tailwind.config.js file to require installed node modules.
 // Usage example: const colors = require(`${themeDirRequire}/tailwindcss/colors`);
-global.themeDirRequire = `${tailwindDir}/node_modules`
+global.themeDirRequire = `${tailwindDir}/node_modules`;
 
 /**
  * Set the purge content as absolute paths on configClone in targetVersion structure
  */
-function copyPurgeContentInTargetVersion(targetVersion, extensionConfig, configClone, pathToModule) {
-  const pathsInModule = extensionConfig.purge && extensionConfig.purge.content
-    ? extensionConfig.purge.content
-    : (extensionConfig.content || []);
+function copyPurgeContentInTargetVersion(
+  targetVersion,
+  extensionConfig,
+  configClone,
+  pathToModule
+) {
+  const pathsInModule =
+    extensionConfig.purge && extensionConfig.purge.content
+      ? extensionConfig.purge.content
+      : extensionConfig.content || [];
 
   if (pathsInModule.length === 0) {
     return;
   }
 
   // Prepend each content config record from module with the path to the module view/frontend/tailwind directory
-  const fullPaths = pathsInModule.map(item => path.join(pathToModule, 'view/frontend/tailwind', item));
+  const fullPaths = pathsInModule.map((item) =>
+    path.join(pathToModule, "view/frontend/tailwind", item)
+  );
 
   // Set purge content in target version configuration structure
-  if (targetVersion === 'v3') {
+  if (targetVersion === "v3") {
     configClone.content = fullPaths;
   } else {
     if (!configClone.purge) configClone.purge = {};
@@ -58,17 +76,22 @@ function copyPurgeContentInTargetVersion(targetVersion, extensionConfig, configC
 /**
  * Set the extensionConfig safelist on configClone in targetVersion structure
  */
-function copySafelistInTargetVersion(targetVersion, extensionConfig, configClone) {
-  const safelist = extensionConfig.purge && extensionConfig.purge.safelist
-    ? extensionConfig.purge.safelist
-    : (extensionConfig.safelist || []);
+function copySafelistInTargetVersion(
+  targetVersion,
+  extensionConfig,
+  configClone
+) {
+  const safelist =
+    extensionConfig.purge && extensionConfig.purge.safelist
+      ? extensionConfig.purge.safelist
+      : extensionConfig.safelist || [];
 
   if (safelist.length === 0) {
     return;
   }
 
   // Set safelist in target version configuration structure
-  if (targetVersion === 'v3') {
+  if (targetVersion === "v3") {
     configClone.safelist = safelist;
   } else {
     if (!configClone.purge) configClone.purge = {};
@@ -76,17 +99,25 @@ function copySafelistInTargetVersion(targetVersion, extensionConfig, configClone
   }
 }
 
-function buildModuleConfigForVersion(targetVersion, extensionConfig, modulePath) {
-
+function buildModuleConfigForVersion(
+  targetVersion,
+  extensionConfig,
+  modulePath
+) {
   // Use a clone of the config object to avoid deepmerge concatenating the arrays multiple times.
   // The reason is require(moduleConfigFile) always returns the same instance on multiple calls,
   // and mutating it is a lasting side effect that affects the return value of subsequent
   // require() calls for the same file.
 
   // Create shallow clone of extensionConfig without content, safelist and purge
-  const {content, safelist, purge, ...configClone} = extensionConfig;
+  const { content, safelist, purge, ...configClone } = extensionConfig;
 
-  copyPurgeContentInTargetVersion(targetVersion, extensionConfig, configClone, modulePath);
+  copyPurgeContentInTargetVersion(
+    targetVersion,
+    extensionConfig,
+    configClone,
+    modulePath
+  );
   copySafelistInTargetVersion(targetVersion, extensionConfig, configClone);
 
   // Currently only purge.content and purge.safelist are supported.
@@ -97,16 +128,29 @@ function buildModuleConfigForVersion(targetVersion, extensionConfig, modulePath)
   return configClone;
 }
 
-function mergeExtensionConfig(targetVersion, mergeTarget, extensionConfig, modulePath) {
-  const toMerge = buildModuleConfigForVersion(targetVersion, extensionConfig, modulePath);
+function mergeExtensionConfig(
+  targetVersion,
+  mergeTarget,
+  extensionConfig,
+  modulePath
+) {
+  const toMerge = buildModuleConfigForVersion(
+    targetVersion,
+    extensionConfig,
+    modulePath
+  );
 
   return deepmerge(mergeTarget, toMerge);
 }
 
-/** @type {Object|boolean} */
-const hyvaThemesConfig = basePath
-  ? JSON.parse(fs.readFileSync(path.join(basePath, hyvaThemeJsonInModule)))
-  : false;
+const hyvaThemesConfig = (() => {
+  try {
+    return basePath ? JSON.parse(fs.readFileSync(path.join(basePath, hyvaThemeJsonInModule))) : {};
+  } catch {
+    console.warn(`${cStyle.warning}No hyva-themes.json found, make sure to create one with bin/magento hyva:config:generate${cStyle.reset}`);
+    return {};
+  }
+})();
 
 /**
  * Add the full path to each path in a array
@@ -115,14 +159,16 @@ const hyvaThemesConfig = basePath
  * @param {string} key - key from paths to use
  * @returns string[] | []
  */
-function setFullPaths(paths, key = '') {
-  return Object.values(paths || []).map((module) => path.join(basePath, key ? module[key] : module));
+function setFullPaths(paths, key = "") {
+  return Object.values(paths || []).map((module) =>
+    path.join(basePath, key ? module[key] : module)
+  );
 }
 
-const hyvaModuleDirs = hyvaThemesConfig && setFullPaths(hyvaThemesConfig.extensions, 'src');
+const hyvaModuleDirs =
+  hyvaThemesConfig && setFullPaths(hyvaThemesConfig.extensions, "src");
 
 function mergeTailwindConfig(baseConfig) {
-
   if (!basePath) {
     // Since this is a new feature, we're not gonna display any error messages.
     // console.log(
@@ -133,23 +179,31 @@ function mergeTailwindConfig(baseConfig) {
   }
 
   // Tailwind v2 uses config.purge.content, v3 uses config.content.
-  const targetTailwindVersion = baseConfig.purge ? 'v2' : 'v3';
+  const targetTailwindVersion = baseConfig.purge ? "v2" : "v3";
 
   let mergeConfig = {};
 
   for (const modulePath of hyvaModuleDirs) {
-    const moduleConfigFile = path.join(modulePath, 'view/frontend/tailwind/tailwind.config.js');
+    const moduleConfigFile = path.join(
+      modulePath,
+      "view/frontend/tailwind/tailwind.config.js"
+    );
 
     if (fs.existsSync(moduleConfigFile)) {
-      const extensionConfig = require(moduleConfigFile)
+      const extensionConfig = require(moduleConfigFile);
 
       // Merge the tailwind configuration from modules
-      mergeConfig = mergeExtensionConfig(targetTailwindVersion, mergeConfig, extensionConfig, modulePath)
+      mergeConfig = mergeExtensionConfig(
+        targetTailwindVersion,
+        mergeConfig,
+        extensionConfig,
+        modulePath
+      );
     }
   }
 
   // Merge theme config last so it takes precedence over all module configurations
-  return deepmerge(mergeConfig, baseConfig)
+  return deepmerge(mergeConfig, baseConfig);
 }
 
 /**
@@ -162,26 +216,35 @@ function mergeTailwindConfig(baseConfig) {
  * @returns {Object} PostCSS plugin object.
  */
 const postcssImportHyvaModules = (opts = {}) => {
-  const includeDirs = (opts.hyvaModuleDirs && setFullPaths(opts.hyvaModuleDirs)) || hyvaModuleDirs || [];
-  const excludeDirs = (opts.excludeDirs && setFullPaths(opts.excludeDirs)) || [];
-  const moduleDirs = includeDirs.filter((value) => !excludeDirs.includes(value));
-  const cssPath = 'view/frontend/tailwind/tailwind-source.css';
+  const includeDirs =
+    (opts.hyvaModuleDirs && setFullPaths(opts.hyvaModuleDirs)) ||
+    hyvaModuleDirs ||
+    [];
+  const excludeDirs =
+    (opts.excludeDirs && setFullPaths(opts.excludeDirs)) || [];
+  const moduleDirs = includeDirs.filter(
+    (value) => !excludeDirs.includes(value)
+  );
+  const cssPath = "view/frontend/tailwind/tailwind-source.css";
 
   return {
-    postcssPlugin: 'hyva-postcss-in-modules',
+    postcssPlugin: "hyva-postcss-in-modules",
     Once(root, postcss) {
       moduleDirs.forEach((moduleDir) => {
         const moduleTailwindSourceCss = path.join(moduleDir, cssPath);
 
         if (fs.existsSync(moduleTailwindSourceCss)) {
-          const importRule = new postcss.AtRule({name: 'import', params: `"${moduleTailwindSourceCss}"`});
+          const importRule = new postcss.AtRule({
+            name: "import",
+            params: `"${moduleTailwindSourceCss}"`,
+          });
 
           importRule.source = root.source;
           root.append(importRule);
         }
       });
-    }
-  }
+    },
+  };
 };
 postcssImportHyvaModules.postcss = true;
 
@@ -200,5 +263,5 @@ module.exports = {
   // Function to add the CSS variable syntax from Tailwind v4
   twVar,
   // Same as twVar but works for a objects as input
-  twProps
+  twProps,
 };
