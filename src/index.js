@@ -147,7 +147,7 @@ const hyvaThemesConfig = (() => {
   try {
     return basePath ? JSON.parse(fs.readFileSync(path.join(basePath, hyvaThemeJsonInModule))) : {};
   } catch {
-    console.warn(`${cStyle.warning}No hyva-themes.json found, make sure to create one with bin/magento hyva:config:generate${cStyle.reset}`);
+    console.warn(`${cStyle.warning}No hyva-themes.json found, make sure to create one with bin/magento hyva:config:generate${cStyle.reset}\n`);
     return {};
   }
 })();
