@@ -12,10 +12,10 @@ const { twVar, twProps } = require('./tailwind-css-props');
 
 // Console styles
 const cStyle = {
-  reset: "\x1B[0m",
-  success: "\x1B[32m",
-  warning: "\x1B[33m",
-  error: "\x1B[31m",
+  reset: '\x1B[0m',
+  success: '\x1B[32m',
+  warning: '\x1B[33m',
+  error: '\x1B[31m',
 };
 
 // Determine Magento base dir by searching for parent dir containing an app/ and a vendor/ folder
