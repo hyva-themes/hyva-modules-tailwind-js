@@ -132,7 +132,7 @@ function setFullPaths(paths, key = '') {
   return Object.values(paths || []).map((module) => path.join(basePath, key ? module[key] : module));
 }
 
-const hyvaModuleDirs = hyvaThemesConfig && setFullPaths(hyvaThemesConfig.extensions, 'src');
+const hyvaModuleDirs = hyvaThemesConfig ? setFullPaths(hyvaThemesConfig.extensions, 'src') : [];
 
 function mergeTailwindConfig(baseConfig) {
 
