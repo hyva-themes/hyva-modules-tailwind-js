@@ -10,6 +10,14 @@ const path = require('path');
 const { cwd } = require('process');
 const { twVar, twProps } = require('./tailwind-css-props');
 
+// Console styles
+const cStyle = {
+  reset: '\x1B[0m',
+  success: '\x1B[32m',
+  warning: '\x1B[33m',
+  error: '\x1B[31m',
+};
+
 // Determine Magento base dir by searching for parent dir containing an app/ and a vendor/ folder
 const basePath = (function findBaseDirPath(dir) {
   const isBaseDir = fs.existsSync(path.join(dir, 'app')) && fs.existsSync(path.join(dir, 'vendor'))
@@ -104,9 +112,14 @@ function mergeExtensionConfig(targetVersion, mergeTarget, extensionConfig, modul
 }
 
 /** @type {Object|boolean} */
-const hyvaThemesConfig = basePath
-  ? JSON.parse(fs.readFileSync(path.join(basePath, hyvaThemeJsonInModule)))
-  : false;
+const hyvaThemesConfig = (() => {
+  try {
+    return basePath ? JSON.parse(fs.readFileSync(path.join(basePath, hyvaThemeJsonInModule))) : false;
+  } catch {
+    console.info(`${cStyle.warning}No hyva-themes.json found, make sure to create one with bin/magento hyva:config:generate${cStyle.reset}\n`);
+    return false;
+  }
+})();
 
 /**
  * Add the full path to each path in a array
@@ -119,7 +132,7 @@ function setFullPaths(paths, key = '') {
   return Object.values(paths || []).map((module) => path.join(basePath, key ? module[key] : module));
 }
 
-const hyvaModuleDirs = hyvaThemesConfig && setFullPaths(hyvaThemesConfig.extensions, 'src');
+const hyvaModuleDirs = hyvaThemesConfig ? setFullPaths(hyvaThemesConfig.extensions, 'src') : [];
 
 function mergeTailwindConfig(baseConfig) {
 
