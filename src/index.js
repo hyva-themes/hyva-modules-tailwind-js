@@ -111,12 +111,13 @@ function mergeExtensionConfig(targetVersion, mergeTarget, extensionConfig, modul
   return deepmerge(mergeTarget, toMerge);
 }
 
+/** @type {Object|boolean} */
 const hyvaThemesConfig = (() => {
   try {
-    return basePath ? JSON.parse(fs.readFileSync(path.join(basePath, hyvaThemeJsonInModule))) : {};
+    return basePath ? JSON.parse(fs.readFileSync(path.join(basePath, hyvaThemeJsonInModule))) : false;
   } catch {
     console.info(`${cStyle.warning}No hyva-themes.json found, make sure to create one with bin/magento hyva:config:generate${cStyle.reset}\n`);
-    return {};
+    return false;
   }
 })();
 
@@ -131,7 +132,7 @@ function setFullPaths(paths, key = '') {
   return Object.values(paths || []).map((module) => path.join(basePath, key ? module[key] : module));
 }
 
-const hyvaModuleDirs = setFullPaths(hyvaThemesConfig.extensions, 'src');
+const hyvaModuleDirs = hyvaThemesConfig && setFullPaths(hyvaThemesConfig.extensions, 'src');
 
 function mergeTailwindConfig(baseConfig) {
 
@@ -205,7 +206,7 @@ module.exports = {
   mergeTailwindConfig,
   // Postcss plugin to add @import nodes for all tailwind-source.css files in modules
   postcssImportHyvaModules,
-  // Parsed contents of the app/etc/hyva-themes.json file
+  // Parsed contents of the app/etc/hyva-themes.json file (or false)
   hyvaThemesConfig,
   // Array of absolute paths to Hyvä modules
   hyvaModuleDirs,
