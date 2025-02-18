@@ -10,6 +10,14 @@ const path = require('path');
 const { cwd } = require('process');
 const { twVar, twProps } = require('./tailwind-css-props');
 
+// Console styles
+const cStyle = {
+  reset: '\x1B[0m',
+  success: '\x1B[32m',
+  warning: '\x1B[33m',
+  error: '\x1B[31m',
+};
+
 // Determine Magento base dir by searching for parent dir containing an app/ and a vendor/ folder
 const basePath = (function findBaseDirPath(dir) {
   const isBaseDir = fs.existsSync(path.join(dir, 'app')) && fs.existsSync(path.join(dir, 'vendor'))
@@ -104,9 +112,14 @@ function mergeExtensionConfig(targetVersion, mergeTarget, extensionConfig, modul
 }
 
 /** @type {Object|boolean} */
-const hyvaThemesConfig = basePath
-  ? JSON.parse(fs.readFileSync(path.join(basePath, hyvaThemeJsonInModule)))
-  : false;
+const hyvaThemesConfig = (() => {
+  try {
+    return basePath ? JSON.parse(fs.readFileSync(path.join(basePath, hyvaThemeJsonInModule))) : false;
+  } catch {
+    console.info(`${cStyle.warning}No hyva-themes.json found, make sure to create one with bin/magento hyva:config:generate${cStyle.reset}\n`);
+    return false;
+  }
+})();
 
 /**
  * Add the full path to each path in a array
@@ -123,12 +136,7 @@ const hyvaModuleDirs = hyvaThemesConfig && setFullPaths(hyvaThemesConfig.extensi
 
 function mergeTailwindConfig(baseConfig) {
 
-  if (!basePath) {
-    // Since this is a new feature, we're not gonna display any error messages.
-    // console.log(
-    //     '\x1b[36mwarn\x1b[0m - File \'hyva-themes.json\' not found.',
-    //     'Run \x1b[36mbin/magento hyva:config:generate\x1b[0m and try again.'
-    // );
+  if (!basePath || !hyvaModuleDirs) {
     return baseConfig;
   }
 
