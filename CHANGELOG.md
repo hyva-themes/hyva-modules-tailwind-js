@@ -2,13 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
-[unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.10...HEAD
+[unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.11...HEAD
 
 No pending changes.
+
+## [1.0.11] - 2025-02-18
+[1.0.11]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.10...1.0.11
+
+### Fixed
+
+- Throw an error when building TailwindCSS without a hyva-themes.json file
 
 ## [1.0.10] - 2024-10-18
 [1.0.10]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.9...1.0.10
