@@ -132,16 +132,11 @@ function setFullPaths(paths, key = '') {
   return Object.values(paths || []).map((module) => path.join(basePath, key ? module[key] : module));
 }
 
-const hyvaModuleDirs = hyvaThemesConfig ? setFullPaths(hyvaThemesConfig.extensions, 'src') : [];
+const hyvaModuleDirs = hyvaThemesConfig && setFullPaths(hyvaThemesConfig.extensions, 'src');
 
 function mergeTailwindConfig(baseConfig) {
 
-  if (!basePath) {
-    // Since this is a new feature, we're not gonna display any error messages.
-    // console.log(
-    //     '\x1b[36mwarn\x1b[0m - File \'hyva-themes.json\' not found.',
-    //     'Run \x1b[36mbin/magento hyva:config:generate\x1b[0m and try again.'
-    // );
+  if (!basePath || !hyvaModuleDirs) {
     return baseConfig;
   }
 
