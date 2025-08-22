@@ -14,11 +14,11 @@
 import { cssVarRegex, kebabCase, flattenObj } from "./utils/index.js";
 
 const toScssVar = (token) => {
-	if (typeof token !== "string") return token;
+    if (typeof token !== "string") return token;
 
-	return token.replace(cssVarRegex, (match, tokenVal) => {
-		return `#{$${tokenVal}}`;
-	});
+    return token.replace(cssVarRegex, (match, tokenVal) => {
+        return `#{$${tokenVal}}`;
+    });
 };
 
 /**
@@ -32,98 +32,98 @@ const toScssVar = (token) => {
  * @returns {string} The generated CSS/SCSS styles as a string.
  */
 const toStyleTokens = (
-	props,
-	{
-		selector = ":root",
-		mediaDark = "@media (prefers-color-scheme: dark)",
-		varSyntax = "--",
-	} = {},
+    props,
+    {
+        selector = ":root",
+        mediaDark = "@media (prefers-color-scheme: dark)",
+        varSyntax = "--",
+    } = {}
 ) => {
-	const indent = varSyntax === "--" ? "\t" : "";
-	const flatProps = flattenObj(props);
-	const isScss = varSyntax === "$";
-	const isTw4 = selector === "@theme";
+    const indent = varSyntax === "--" ? "\t" : "";
+    const flatProps = flattenObj(props);
+    const isScss = varSyntax === "$";
+    const isTw4 = selector === "@theme";
 
-	let styles = "";
-	let stylesDark = "";
-	let appendedMeta = "";
-	let result = "";
+    let styles = "";
+    let stylesDark = "";
+    let appendedMeta = "";
+    let result = "";
 
-	Object.entries(flatProps).forEach(([name, value]) => {
-		const isProperty = name.endsWith("-@");
-		const isDarkMode = name.includes("-@media:dark");
+    Object.entries(flatProps).forEach(([name, value]) => {
+        const isProperty = name.endsWith("-@");
+        const isDarkMode = name.includes("-@media:dark");
 
-		if (Array.isArray(value)) value = value.join(", ");
+        if (Array.isArray(value)) value = value.join(", ");
 
-		if (isProperty) {
-			appendedMeta += isTw4
-				? `${appendedMeta ? "\n\n" : ""}${indent}${value}`
-				: `${appendedMeta ? "\n\n" : ""}${value}`;
-			return;
-		}
+        if (isProperty) {
+            appendedMeta += isTw4
+                ? `${appendedMeta ? "\n\n" : ""}${indent}${value}`
+                : `${appendedMeta ? "\n\n" : ""}${value}`;
+            return;
+        }
 
-		if (name.includes(".")) {
-			name = name.replaceAll(".", "");
-		}
+        if (name.includes(".")) {
+            name = name.replaceAll(".", "");
+        }
 
-		name = kebabCase(name);
+        name = kebabCase(name);
 
-		if (name.endsWith("-default")) {
-			name = name.replace("-default", "");
-		}
+        if (name.endsWith("-default")) {
+            name = name.replace("-default", "");
+        }
 
-		let varName = `${varSyntax}${name}`;
+        let varName = `${varSyntax}${name}`;
 
-		if (isDarkMode) {
-			varName = varName.replace("-@media:dark", isScss ? "-dark" : "");
-		}
+        if (isDarkMode) {
+            varName = varName.replace("-@media:dark", isScss ? "-dark" : "");
+        }
 
-		// Handle SCSS specific escaped values
-		if (typeof value === "string" && isScss) {
-			const regex = /[\/><=]|^\(.*\)$/;
+        // Handle SCSS specific escaped values
+        if (typeof value === "string" && isScss) {
+            const regex = /[\/><=]|^\(.*\)$/;
 
-			// If the value contains any of the characters /, >, <, >=, <=
-			// or is wrapped in parentheses, wrap it in quotes
-			if (regex.test(value)) {
-				value = `"${value}"`;
-			}
-		}
+            // If the value contains any of the characters /, >, <, >=, <=
+            // or is wrapped in parentheses, wrap it in quotes
+            if (regex.test(value)) {
+                value = `"${value}"`;
+            }
+        }
 
-		if (isScss) {
-			value = toScssVar(value);
-		}
+        if (isScss) {
+            value = toScssVar(value);
+        }
 
-		if (isDarkMode) {
-			stylesDark += `${indent}${indent}${varName}: ${value};\n`;
-		} else {
-			styles += `${indent}${varName}: ${value};\n`;
-		}
-	});
+        if (isDarkMode) {
+            stylesDark += `${indent}${indent}${varName}: ${value};\n`;
+        } else {
+            styles += `${indent}${varName}: ${value};\n`;
+        }
+    });
 
-	if (isScss) {
-		result = styles;
-		result += stylesDark;
-		result += appendedMeta ? `\n${appendedMeta}` : "";
-	} else if (isTw4) {
-		if (styles || appendedMeta) {
-			result = `${selector} {\n`;
-			result += styles ? styles : "";
-			result += appendedMeta ? `\n${appendedMeta}` : "";
-			result += `\n}\n`;
-		}
+    if (isScss) {
+        result = styles;
+        result += stylesDark;
+        result += appendedMeta ? `\n${appendedMeta}` : "";
+    } else if (isTw4) {
+        if (styles || appendedMeta) {
+            result = `${selector} {\n`;
+            result += styles ? styles : "";
+            result += appendedMeta ? `\n${appendedMeta}` : "";
+            result += `\n}\n`;
+        }
 
-		result += stylesDark
-			? `\n${mediaDark} {\n\t:root {\n${stylesDark}\t}\n}`
-			: "";
-	} else {
-		result = styles ? `${selector} {\n${styles}}\n` : "";
-		result += stylesDark
-			? `\n${mediaDark} {\n\t${selector} {\n${stylesDark}\t}\n}`
-			: "";
-		result += appendedMeta ? `\n${appendedMeta}` : "";
-	}
+        result += stylesDark
+            ? `\n${mediaDark} {\n\t:root {\n${stylesDark}\t}\n}`
+            : "";
+    } else {
+        result = styles ? `${selector} {\n${styles}}\n` : "";
+        result += stylesDark
+            ? `\n${mediaDark} {\n\t${selector} {\n${stylesDark}\t}\n}`
+            : "";
+        result += appendedMeta ? `\n${appendedMeta}` : "";
+    }
 
-	return result.trim();
+    return result.trim();
 };
 
 export default toStyleTokens;

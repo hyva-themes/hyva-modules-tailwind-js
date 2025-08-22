@@ -4,15 +4,15 @@
  * This library is distributed under the BSD-3-Clause license.
  */
 
-import { tokenVarRegex } from "./utils.js";
+import { tokenVarRegex } from "./utils/index.js";
 
 const groupKeysFigma = [
-	"other",
-	"sizing",
-	"borderWidth",
-	"borderRadius",
-	"boxShadow",
-	"color",
+    "other",
+    "sizing",
+    "borderWidth",
+    "borderRadius",
+    "boxShadow",
+    "color",
 ];
 
 /**
@@ -33,52 +33,52 @@ const groupKeysFigma = [
  * @returns {object} A simplified object with the token values.
  */
 const fromTokens = (props, syntax = "default") => {
-	const isFigma = syntax === "figma";
-	const keyValueName = isFigma ? "value" : "$value";
+    const isFigma = syntax === "figma";
+    const keyValueName = isFigma ? "value" : "$value";
 
-	if (syntax === "style-dictionary") {
-		console.log("Using default convert syntax");
-		console.log(
-			"To use the style-dictionary convert, please use the converter from https://styledictionary.com/",
-		);
-	}
+    if (syntax === "style-dictionary") {
+        console.log("Using default convert syntax");
+        console.log(
+            "To use the style-dictionary convert, please use the converter from https://styledictionary.com/"
+        );
+    }
 
-	if (Object.prototype.hasOwnProperty.call(props, keyValueName)) {
-		const value = props[keyValueName];
-		if (typeof value === "string") {
-			// Use regex to grab all values with the following example `{color.blue.7}`
-			return value.replace(tokenVarRegex, (_match, group) => {
-				const newGroup = group.replace(/\.value$/, "");
-				const newVar = newGroup.replace(/\./g, "-");
-				return `var(--${newVar})`;
-			});
-		}
-		return value;
-	}
+    if (Object.prototype.hasOwnProperty.call(props, keyValueName)) {
+        const value = props[keyValueName];
+        if (typeof value === "string") {
+            // Use regex to grab all values with the following example `{color.blue.7}`
+            return value.replace(tokenVarRegex, (_match, group) => {
+                const newGroup = group.replace(/\.value$/, "");
+                const newVar = newGroup.replace(/\./g, "-");
+                return `var(--${newVar})`;
+            });
+        }
+        return value;
+    }
 
-	if (typeof props !== "object" || props === null || Array.isArray(props)) {
-		return props;
-	}
+    if (typeof props !== "object" || props === null || Array.isArray(props)) {
+        return props;
+    }
 
-	const newProps = Object.fromEntries(
-		Object.entries(props).map(([key, value]) => [
-			key,
-			fromTokens(value, syntax),
-		]),
-	);
+    const newProps = Object.fromEntries(
+        Object.entries(props).map(([key, value]) => [
+            key,
+            fromTokens(value, syntax),
+        ])
+    );
 
-	if (isFigma) {
-		return Object.entries(newProps).reduce((acc, [key, value]) => {
-			if (groupKeysFigma.includes(key)) {
-				Object.assign(acc, value);
-			} else {
-				acc[key] = value;
-			}
-			return acc;
-		}, {});
-	}
+    if (isFigma) {
+        return Object.entries(newProps).reduce((acc, [key, value]) => {
+            if (groupKeysFigma.includes(key)) {
+                Object.assign(acc, value);
+            } else {
+                acc[key] = value;
+            }
+            return acc;
+        }, {});
+    }
 
-	return newProps;
+    return newProps;
 };
 
 export default fromTokens;

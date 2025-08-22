@@ -3,7 +3,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { cwd, exit } from "node:process";
-import { consoleError,  consoleWarn, getJsonFile } from "../src/utils/index.js";
+import { consoleError, consoleWarn, getJsonFile } from "../src/utils/index.js";
 import fromTokens from "../src/from-tokens.js";
 import toStyle from "../src/to-style.js";
 
