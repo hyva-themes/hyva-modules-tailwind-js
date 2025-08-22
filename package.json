@@ -2,6 +2,7 @@
   "name": "@hyva-themes/hyva-modules",
   "version": "1.0.11",
   "description": "Hyvä-themes TailwindCSS utility functions",
+  "type": "module",
   "homepage": "https://hyva.io",
   "author": "Hyvä Themes BV",
   "license": "BSD-3-Clause",

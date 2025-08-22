@@ -18,5 +18,9 @@ trim_trailing_whitespace = false
 max_line_length = 80
 
 [*.{js,cjs}]
-indent_size = 2
+indent_size = 4
 max_line_length = 80
+
+# Preserve older indent
+[{src/index.js,src/tailwind-css-props.js}]
+indent_size = 2
