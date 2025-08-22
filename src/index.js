@@ -4,11 +4,11 @@
  * This library is distributed under the BSD-3-Clause license.
  */
 
-const deepmerge = require('deepmerge')
-const fs = require('fs')
-const path = require('path');
-const { cwd } = require('process');
-const { twVar, twProps } = require('./tailwind-css-props');
+import deepmerge from 'deepmerge';
+import fs from 'fs';
+import path from 'path';
+import { cwd } from 'process';
+import { twVar, twProps } from './tailwind-css-props';
 
 // Console styles
 const cStyle = {
@@ -196,7 +196,7 @@ postcssImportHyvaModules.postcss = true;
 // For testing
 mergeTailwindConfig.mergeExtensionConfig = mergeExtensionConfig;
 
-module.exports = {
+export default {
   // Function to merge TailwindCSS configurations from modules
   mergeTailwindConfig,
   // Postcss plugin to add @import nodes for all tailwind-source.css files in modules

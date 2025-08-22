@@ -1,6 +1,8 @@
 /**
  * Fylgja (https://fylgja.dev)
  * Licensed under MIT Open Source
+ *
+ * @source https://github.com/fylgja/fylgja/blob/main/props-builder/src/to-style.js
  */
 
 /**
@@ -9,7 +11,7 @@
  * This library is distributed under the BSD-3-Clause license.
  */
 
-import { cssVarRegex, kebabCase, flattenObj } from "./utils.js";
+import { cssVarRegex, kebabCase, flattenObj } from "./utils/index.js";
 
 const toScssVar = (token) => {
 	if (typeof token !== "string") return token;

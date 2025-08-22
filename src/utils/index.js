@@ -14,6 +14,16 @@ export const cssVarRegex = /var\(--([a-zA-Z0-9-]+)\)/g;
 export const tokenVarRegex = /\{([a-zA-Z0-9.-]+)\}/g;
 
 /**
+ * Convert a string to kebab case.
+ *
+ * @param {string} string
+ * @returns {string} kebab case string
+ */
+export function kebabCase(string) {
+	return string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+}
+
+/**
  * Flatten Object into a flat Object
  *
  * @source https://github.com/fylgja/fylgja/blob/main/props-builder/src/utils.js
