@@ -22,5 +22,5 @@ indent_size = 4
 max_line_length = 80
 
 # Preserve older indent
-[{src/index.js,src/tailwind-css-props.js}]
+[{src/index.js,src/index.cjs,src/tailwind-css-props.js}]
 indent_size = 2

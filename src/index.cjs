@@ -4,11 +4,11 @@
  * This library is distributed under the BSD-3-Clause license.
  */
 
-import deepmerge from 'deepmerge';
-import fs from 'fs';
-import path from 'path';
-import { cwd } from 'process';
-import { twVar, twProps } from './tailwind-css-props';
+const deepmerge = require('deepmerge');
+const fs = require('fs');
+const path = require('path');
+const { cwd } = require('process');
+const { twVar, twProps } = require('./tailwind-css-props');
 
 // Console styles
 const cStyle = {
