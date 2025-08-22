@@ -27,6 +27,8 @@ const groupKeysFigma = [
  *
  * For Figma tokens, it also unnest values from groups defined in `groupKeysFigma`.
  *
+ * @source https://github.com/fylgja/fylgja/blob/main/props-builder/src/to-style.js
+ *
  * @param {object} props The design token object to convert.
  * @param {string} [syntax="default"] The syntax of the design token object.
  *  Supported values are "default", "figma", and "style-dictionary".
