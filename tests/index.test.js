@@ -4,7 +4,7 @@
  * This library is distributed under the BSD-3-Clause license.
  */
 
-const { mergeTailwindConfig, hyvaThemesConfig, hyvaModuleDirs } = require('../src/index');
+const { mergeTailwindConfig, hyvaThemesConfig, hyvaModuleDirs } = require('../src/index.cjs');
 
 const sut = mergeTailwindConfig;
 
