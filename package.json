@@ -22,6 +22,11 @@
       "require": "./src/index.cjs",
       "default": "./src/index.cjs"
     },
+    "./tailwind-css-props": {
+      "import": "./src/tailwind-css-props.js",
+      "require": "./src/tailwind-css-props.cjs",
+      "default": "./src/tailwind-css-props.cjs"
+    },
     "./*": "./*"
   },
   "bin": {
