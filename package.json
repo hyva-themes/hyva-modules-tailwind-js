@@ -36,6 +36,10 @@
   "scripts": {
     "test": "jest"
   },
+  "files": [
+    "bin",
+    "src"
+  ],
   "dependencies": {
     "deepmerge": "^4.2.2"
   },
