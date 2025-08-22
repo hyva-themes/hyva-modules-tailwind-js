@@ -16,8 +16,8 @@
   "keywords": [],
   "main": "src/index.js",
   "bin": {
-    "sources": "./bin/generate-sources.js",
-    "tokens": "./bin/generate-tokens.js"
+    "hyva-sources": "./bin/generate-sources.js",
+    "hyva-tokens": "./bin/generate-tokens.js"
   },
   "scripts": {
     "test": "jest"
