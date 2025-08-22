@@ -8,7 +8,7 @@ const deepmerge = require('deepmerge');
 const fs = require('fs');
 const path = require('path');
 const { cwd } = require('process');
-const { twVar, twProps } = require('./tailwind-css-props');
+const { twVar, twProps } = require('./tailwind-css-props.cjs');
 
 // Console styles
 const cStyle = {

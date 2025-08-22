@@ -8,7 +8,7 @@ import deepmerge from 'deepmerge';
 import fs from 'fs';
 import path from 'path';
 import { cwd } from 'process';
-import { twVar, twProps } from './tailwind-css-props';
+import { twVar, twProps } from './tailwind-css-props.js';
 
 // Console styles
 const cStyle = {
