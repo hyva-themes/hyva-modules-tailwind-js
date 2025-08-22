@@ -1,7 +1,11 @@
 {
   "overrides": [
     {
-      "files": ["./src/index.js", "./src/tailwind-css-props.js"],
+      "files": [
+        "./src/index.js",
+        "./src/index.cjs",
+        "./src/tailwind-css-props.js"
+      ],
       "options": {
         "singleQuote": true,
         "trailingComma": "none"
