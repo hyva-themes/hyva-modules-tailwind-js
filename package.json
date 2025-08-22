@@ -1,27 +1,27 @@
 {
   "name": "@hyva-themes/hyva-modules",
   "version": "1.0.11",
-  "homepage": "https://hyva.io",
-  "bugs": {
-    "email": "info@hyva.io"
-  },
   "description": "Hyvä-themes TailwindCSS utility functions",
-  "main": "src/index.js",
-  "scripts": {
-    "test": "jest"
-  },
+  "homepage": "https://hyva.io",
+  "author": "Hyvä Themes BV",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
     "url": "https://github.com/hyva-themes/hyva-modules-tailwind-js.git"
   },
+  "bugs": {
+    "email": "info@hyva.io"
+  },
+  "keywords": [],
+  "main": "src/index.js",
+  "bin": {
+    "sources": "./bin/generate-sources.js",
+    "tokens": "./bin/generate-tokens.js"
+  },
+  "scripts": {
+    "test": "jest"
+  },
   "devDependencies": {
     "jest": "^27.5.1"
-  },
-  "dependencies": {
-    "deepmerge": "^4.2.2"
-  },
-  "engines" : {
-    "node" : ">=12.13.0"
   }
 }
