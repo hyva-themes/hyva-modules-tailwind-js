@@ -30,6 +30,7 @@
     "./*": "./*"
   },
   "bin": {
+    "hyva-init": "./bin/init-config.js",
     "hyva-sources": "./bin/generate-sources.js",
     "hyva-tokens": "./bin/generate-tokens.js"
   },
