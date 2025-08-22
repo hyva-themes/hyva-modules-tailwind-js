@@ -196,7 +196,7 @@ postcssImportHyvaModules.postcss = true;
 // For testing
 mergeTailwindConfig.mergeExtensionConfig = mergeExtensionConfig;
 
-export default {
+module.exports = {
   // Function to merge TailwindCSS configurations from modules
   mergeTailwindConfig,
   // Postcss plugin to add @import nodes for all tailwind-source.css files in modules
