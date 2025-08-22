@@ -1,8 +1,6 @@
 /**
  * Fylgja (https://fylgja.dev)
  * Licensed under MIT Open Source
- *
- * @source https://github.com/fylgja/fylgja/blob/main/props-builder/src/to-style.js
  */
 
 /**
@@ -23,6 +21,8 @@ const toScssVar = (token) => {
 
 /**
  * Creates array of tokens from a javascript object with CSS props.
+ *
+ * @source https://github.com/fylgja/fylgja/blob/main/props-builder/src/to-style.js
  *
  * @param {Object} props - The input object with CSS properties.
  * @param {Object} options - The options for generating tokens.
