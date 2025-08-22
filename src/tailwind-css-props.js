@@ -104,4 +104,4 @@ function twProps(values, prefix = '') {
   return wrapWithCSSVar(values);
 }
 
-export default { twVar, twProps };
+export { twVar, twProps };
