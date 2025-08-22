@@ -7,7 +7,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 [unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.11...HEAD
 
-No pending changes.
+### Added
+
+- Support for ESM syntax
+- Added new command (`hyva-source`) for building Tailwind v4 sources for each Hyva compatible module.
+- Added new command (`hyva-tokens`) for building Tailwind v4 Tokens based on a Design Tokens file.
+
+### Changed
+
+- Bumped minimal Node version to version 20 to match the Tailwind v4 version
 
 ## [1.0.11] - 2025-02-18
 
