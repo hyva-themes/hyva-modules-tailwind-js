@@ -121,7 +121,7 @@ This acts as a wrapper and uses the keys as the name for the CSS variable.
 For example, if `twProps` wraps `primary > lighter`, it will create the name `--primary-lighter`.
 
 <details>
-<summary>In this example, we can create the same effect as `twVar` with less effort:</summary>
+<summary>In this example, we can create the same effect as <code>twVar</code> with less effort:</summary>
 
 ```js
 const { twProps, mergeTailwindConfig } = require('@hyva-themes/hyva-modules');
