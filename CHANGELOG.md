@@ -10,8 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 - Support for ESM syntax
-- Added new command (`hyva-source`) for building Tailwind v4 sources for each Hyva compatible module.
-- Added new command (`hyva-tokens`) for building Tailwind v4 Tokens based on a Design Tokens file.
+- Added new Node command `hyva-init`, creating a initial config file.
+- Added new Node command `hyva-tokens`, for building Tailwind Tokens based on a Design Tokens file.
+- Added new Node command `hyva-source`, for building Tailwind v4 sources for each Hyva compatible module.
 
 ### Changed
 
