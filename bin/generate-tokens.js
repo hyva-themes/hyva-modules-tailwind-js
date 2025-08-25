@@ -23,7 +23,7 @@ if (hyvaConfigTokens?.src && hyvaConfigTokens?.values) {
     );
 }
 
-const designTokensFile = hyvaConfigTokens?.src || "design-tokens.json";
+const designTokensFile = hyvaConfigTokens?.src || "design.tokens.json";
 if (
     hyvaConfigTokens?.src &&
     !hyvaConfigTokens.src.trim().toLowerCase().endsWith(".json")
