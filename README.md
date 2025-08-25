@@ -1,6 +1,6 @@
 # Hyvä Themes Tailwind Utilities
 
-[![Go to hyva.io](https://img.shields.io/badge/hyva.io-0A23B9?style=for-the-badge)](hyva.io)
+[![Go to hyva.io](https://img.shields.io/badge/hyva.io-0A23B9?style=for-the-badge)](https://hyva.io)
 ![NPM Version](https://img.shields.io/npm/v/%40hyva-themes%2Fhyva-modules?style=for-the-badge)
 ![GitHub License](https://img.shields.io/github/license/hyva-themes/hyva-modules-tailwind-js?style=for-the-badge&color=004d32)
 
