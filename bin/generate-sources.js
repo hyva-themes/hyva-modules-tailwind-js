@@ -13,14 +13,11 @@ import {
 
 const hyvaThemesJsonInclude = "hyva-themes.json";
 const hyvaThemesJsonConfig = "hyva.config.json";
-
 const includeConfig = getJsonFile(`app/etc/${hyvaThemesJsonInclude}`, {
     filePath: basePath,
     errorMessage: `No ${hyvaThemesJsonInclude} found, make sure to create one with 'bin/magento hyva:config:generate'`,
 });
 const hyvaConfig = getJsonFile(hyvaThemesJsonConfig);
-
-// Build the list of modules: filter out excluded, then add includes (immutably)
 const filteredModules =
     includeConfig.extensions?.filter((module) => {
         const isExcluded = hyvaConfig.tailwind?.exclude?.some(
@@ -31,7 +28,6 @@ const filteredModules =
 const includedModules = hyvaConfig.tailwind?.include ?? [];
 const hyvaModules = [...filteredModules, ...includedModules];
 
-// Generate source statements
 const { importStatements, sourceStatements, moduleStatements } =
     hyvaModules?.reduce(
         (acc, theme) => {
@@ -72,7 +68,6 @@ const hyvaSourceCSS = `/**
  * please exclude them in your theme using the ${hyvaThemesJsonConfig} configuration.
  */\n\n${sourceStatements}\n${importStatements}\n${moduleStatements}\n`;
 
-// Main async IIFE for top-level await clarity
 (async () => {
     try {
         await fs.mkdir(path.join(cwd(), "generated"), { recursive: true });

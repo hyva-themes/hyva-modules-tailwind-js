@@ -23,7 +23,6 @@ const sampleConfig = {
         exclude: [],
     },
 };
-
 const configFilePath = path.join(cwd(), "hyva.config.json");
 
 (async () => {
