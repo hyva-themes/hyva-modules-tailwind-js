@@ -4,6 +4,11 @@
  * This library is distributed under the BSD-3-Clause license.
  */
 
+/**
+ * Fylgja (https://fylgja.dev)
+ * Licensed under MIT Open Source
+ */
+
 import { tokenVarRegex } from "./utils/index.js";
 
 const groupKeysFigma = [
@@ -27,7 +32,7 @@ const groupKeysFigma = [
  *
  * For Figma tokens, it also unnest values from groups defined in `groupKeysFigma`.
  *
- * @source https://github.com/fylgja/fylgja/blob/main/props-builder/src/to-style.js
+ * @source https://github.com/fylgja/fylgja/blob/main/props-builder/src/from-tokens.js
  *
  * @param {object} props The design token object to convert.
  * @param {string} [syntax="default"] The syntax of the design token object.
