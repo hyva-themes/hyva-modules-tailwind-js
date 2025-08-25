@@ -202,7 +202,7 @@ module.exports = mergeTailwindConfig({
 For more information on `twVar` and `twProps`,
 please read our documentation at [docs.hyva.io](https://docs.hyva.io/hyva-themes/working-with-tailwindcss/css-variables-plus-tailwindcss.html#method-2-using-the-new-twprops-and-twvar-functions).
 
-## NPX Commands for Creating CSS with Tailwind
+## Node Commands for Creating CSS for TailwindCSS
 
 This solution makes our code more future-proof since we don't rely on any Tailwind CSS or PostCSS logic.
 Making it independent of the bundler or a compiler allows us and you to use it with any stack.
