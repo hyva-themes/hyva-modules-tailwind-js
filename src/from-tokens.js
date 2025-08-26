@@ -2,11 +2,9 @@
  * Hyvä Themes - https://hyva.io
  * Copyright © Hyvä Themes 2022-present. All rights reserved.
  * This library is distributed under the BSD-3-Clause license.
- */
-
-/**
- * Fylgja (https://fylgja.dev)
- * Licensed under MIT Open Source
+ *
+ * This file includes sections of code with the copyright ownership by
+ * Fylgja (https://fylgja.dev) published under the MIT Open Source license.
  */
 
 import { tokenVarRegex } from "./utils/index.js";
