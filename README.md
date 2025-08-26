@@ -213,7 +213,7 @@ since Tailwind v4 no longer has a JavaScript configuration and only CSS can be u
 ### `hyva-init`
 
 This command creates a `hyva.config.json` in the theme folder next to `package.json`.
-This file is used with the other command options and allows you to configure the way certain things work.
+This file is used to configure the other `hyva-*` commands.
 
 To run it, use: `npx hyva-init`.
 
