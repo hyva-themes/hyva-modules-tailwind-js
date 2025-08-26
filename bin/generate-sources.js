@@ -3,7 +3,7 @@
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { cwd } from "node:process";
+import { cwd, exit } from "node:process";
 import {
     consoleError,
     basePath,
