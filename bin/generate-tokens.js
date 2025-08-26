@@ -7,6 +7,14 @@ import { consoleError, consoleWarn, getJsonFile } from "../src/utils/index.js";
 import fromTokens from "../src/from-tokens.js";
 import toStyleTokens from "../src/to-style.js";
 
+const currentFolderName = path.basename(cwd());
+if (currentFolderName !== "tailwind") {
+    consoleError(
+        `Hyvä Tokens should be run from a "tailwind" directory\nto ensure everthing is generated in the correct location.`
+    );
+    exit(1);
+}
+
 const hyvaConfig = getJsonFile("hyva.config.json");
 const hyvaConfigTokens = hyvaConfig?.tokens || {};
 

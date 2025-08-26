@@ -11,6 +11,14 @@ import {
     getJsonFile,
 } from "../src/utils/index.js";
 
+const currentFolderName = path.basename(cwd());
+if (currentFolderName !== "tailwind") {
+    consoleError(
+        `Hyvä Sources should be run from a "tailwind" directory\nto ensure everthing is generated in the correct location.`
+    );
+    exit(1);
+}
+
 const hyvaThemesJsonInclude = "hyva-themes.json";
 const hyvaThemesJsonConfig = "hyva.config.json";
 const includeConfig = getJsonFile(`app/etc/${hyvaThemesJsonInclude}`, {

@@ -10,6 +10,14 @@ import {
     consoleSuccess,
 } from "../src/utils/index.js";
 
+const currentFolderName = path.basename(cwd());
+if (currentFolderName !== "tailwind") {
+    consoleError(
+        `Hyvä Init should be run from a "tailwind" directory\nto ensure everthing is generated in the correct location.`
+    );
+    exit(1);
+}
+
 const sampleConfig = {
     tailwind: {
         include: [
