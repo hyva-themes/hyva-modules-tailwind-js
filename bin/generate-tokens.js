@@ -43,7 +43,7 @@ if (
 }
 
 const designTokens = hyvaConfigTokens?.values || getJsonFile(designTokensFile);
-const tokensFormat = hyvaConfigTokens?.format || "figma";
+const tokensFormat = hyvaConfigTokens?.format || "default";
 const cssSelector = hyvaConfigTokens?.cssSelector || "@theme";
 
 if (!designTokens) {
