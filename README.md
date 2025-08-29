@@ -1,8 +1,8 @@
 # Hyvä Themes Tailwind Utilities
 
 [![Go to hyva.io](https://img.shields.io/badge/hyva.io-0A23B9?style=for-the-badge)](https://hyva.io)
-![NPM Version](https://img.shields.io/npm/v/%40hyva-themes%2Fhyva-modules?style=for-the-badge)
-![GitHub License](https://img.shields.io/github/license/hyva-themes/hyva-modules-tailwind-js?style=for-the-badge&color=004d32)
+[![NPM Version](https://img.shields.io/npm/v/%40hyva-themes%2Fhyva-modules?style=for-the-badge)](https://www.npmjs.com/package/@hyva-themes/hyva-modules)
+[![GitHub License](https://img.shields.io/github/license/hyva-themes/hyva-modules-tailwind-js?style=for-the-badge&color=004d32)](https://github.com/hyva-themes/hyva-modules-tailwind-js/blob/main/LICENSE.md)
 
 This NPM package is meant to be used with an installation of Hyvä.
 If you're not sure what Hyvä is, please check out [hyva.io](https://www.hyva.io/) to learn more.
