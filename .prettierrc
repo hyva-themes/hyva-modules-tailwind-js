@@ -1,4 +1,11 @@
 {
-  "singleQuote": true,
-  "trailingComma": "none"
+  "overrides": [
+    {
+      "files": ["./src/index.*", "./src/tailwind-css-props.*"],
+      "options": {
+        "singleQuote": true,
+        "trailingComma": "none"
+      }
+    }
+  ]
 }

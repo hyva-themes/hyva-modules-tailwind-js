@@ -1,27 +1,50 @@
 {
   "name": "@hyva-themes/hyva-modules",
   "version": "1.0.11",
-  "homepage": "https://hyva.io",
-  "bugs": {
-    "email": "info@hyva.io"
-  },
   "description": "Hyvä-themes TailwindCSS utility functions",
-  "main": "src/index.js",
-  "scripts": {
-    "test": "jest"
-  },
+  "type": "module",
+  "homepage": "https://hyva.io",
+  "author": "Hyvä Themes BV",
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
     "url": "https://github.com/hyva-themes/hyva-modules-tailwind-js.git"
   },
-  "devDependencies": {
-    "jest": "^27.5.1"
+  "bugs": {
+    "email": "info@hyva.io"
   },
+  "keywords": [],
+  "main": "src/index.cjs",
+  "module": "src/index.js",
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "require": "./src/index.cjs",
+      "default": "./src/index.cjs"
+    },
+    "./tailwind-css-props": {
+      "import": "./src/tailwind-css-props.js",
+      "require": "./src/tailwind-css-props.cjs",
+      "default": "./src/tailwind-css-props.cjs"
+    },
+    "./*": "./*"
+  },
+  "bin": {
+    "hyva-init": "./bin/init-config.js",
+    "hyva-sources": "./bin/generate-sources.js",
+    "hyva-tokens": "./bin/generate-tokens.js"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
   "dependencies": {
     "deepmerge": "^4.2.2"
   },
-  "engines" : {
-    "node" : ">=12.13.0"
+  "devDependencies": {
+    "jest": "^27.5.1"
   }
 }
