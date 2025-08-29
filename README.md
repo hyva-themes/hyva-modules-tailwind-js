@@ -229,10 +229,13 @@ but if you use **Figma**, you can configure it in `hyva.config.json` to use this
 ```json
 {
     "tokens": {
-        "src": "acme.figma-tokens.json"
+        "src": "acme.figma-tokens.json",
+        "format": "figma"
     }
 }
 ```
+
+Since the format of Figma is diffrent, you need to also pass the `format` key with the value `figma`.
 
 If you only need a few simple tokens, you can also create the tokens directly in `hyva.config.json`:
 
