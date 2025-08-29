@@ -6,7 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-[unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.1.0...HEAD
+[unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.1.1...HEAD
+
+## [1.1.1] - 2025-08-29
+
+[1.1.1]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.1.0...1.1.1
+
 ### Fixed
 
 - Token format, to default instead of Figma, this allows the use of simple tokens without using the format option
