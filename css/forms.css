@@ -22,6 +22,34 @@
     --select-icon-offset: 0.8rem;
 }
 
+@utility form-input-field {
+    appearance: none;
+    padding-block: var(--form-py);
+    padding-inline: var(--form-px);
+    border-radius: var(--form-radius);
+    border-width: 1px;
+    border-color: var(--form-stroke);
+    background-color: var(--form-bg);
+    color: var(--form-color);
+}
+
+@utility form-input-control {
+    appearance: none;
+    flex-shrink: 0;
+    display: inline-block;
+    block-size: --spacing(4);
+    inline-size: --spacing(4);
+    padding: 0;
+    border-width: 2px;
+    border-color: var(--form-stroke);
+    background-color: var(--form-bg);
+    color: var(--form-color);
+    background-origin: border-box;
+    vertical-align: middle;
+    user-select: none;
+    print-color-adjust: exact;
+}
+
 @layer base {
     :is(
         input:where(:not([type])),
@@ -38,16 +66,13 @@
         [type="time"],
         [type="week"],
         textarea,
-        select
+        select,
+        .form-input,
+        .form-textarea,
+        .form-select,
+        .form-multiselect
     ) {
-        appearance: none;
-        padding-block: var(--form-py);
-        padding-inline: var(--form-px);
-        border-radius: var(--form-radius);
-        border-width: 1px;
-        border-color: var(--form-stroke);
-        background-color: var(--form-bg);
-        color: var(--form-color);
+        @apply form-input-field;
 
         &:focus {
             border-color: var(--form-active-color);
@@ -55,7 +80,7 @@
         }
     }
 
-    select:where(:not([size]:not([size="1"]), [multiple])) {
+    :is(select:where(:not([size]:not([size="1"]), [multiple])), .form-select) {
         --_icon-position: right;
         padding-inline-end: calc(
             var(--select-icon-size) + var(--select-icon-offset) + 0.5ch
@@ -70,21 +95,8 @@
         }
     }
 
-    :is([type="checkbox"], [type="radio"]) {
-        appearance: none;
-        display: inline-block;
-        padding: 0;
-        border-width: 2px;
-        border-color: var(--form-stroke);
-        background-color: var(--form-bg);
-        color: var(--form-color);
-        print-color-adjust: exact;
-        vertical-align: middle;
-        background-origin: border-box;
-        user-select: none;
-        flex-shrink: 0;
-        block-size: --spacing(4.5);
-        inline-size: --spacing(4.5);
+    :is([type="checkbox"], [type="radio"], .form-checkbox, .form-radio) {
+        @apply form-input-control;
 
         &:focus {
             outline-color: var(--form-active-color);
@@ -96,7 +108,7 @@
         }
     }
 
-    [type="checkbox"] {
+    :is([type="checkbox"], .form-checkbox) {
         &:checked,
         &:indeterminate {
             border-color: transparent;
@@ -113,7 +125,7 @@
         }
     }
 
-    [type="radio"] {
+    :is([type="radio"], .form-radio) {
         border-radius: 50%;
 
         &:checked {
