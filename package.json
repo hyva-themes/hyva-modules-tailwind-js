@@ -1,6 +1,6 @@
 {
   "name": "@hyva-themes/hyva-modules",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Hyvä-themes TailwindCSS utility functions",
   "type": "module",
   "homepage": "https://hyva.io",
@@ -39,7 +39,8 @@
   },
   "files": [
     "bin",
-    "src"
+    "src",
+    "css"
   ],
   "dependencies": {
     "deepmerge": "^4.2.2"
