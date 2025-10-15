@@ -14,8 +14,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
-- Custom Tailwind v4 Prose CSS, that is way smaller and easier to customize.
-- Tailwind v2 and v3 fallback styles for Tailwind v4.
+- Added a lightweight, customizable `prose` utility, serving as a minimal alternative to the official `@tailwindcss/typography` plugin.
+- Included a lightweight `forms` stylesheet, providing an alternative to the `@tailwindcss/forms` plugin with a smaller footprint.
+- Introduced fallback CSS for Tailwind v2/v3 utilities to ensure backward compatibility with older modules when migrating to Tailwind v4.
 
 ## [1.1.1] - 2025-08-29
 
