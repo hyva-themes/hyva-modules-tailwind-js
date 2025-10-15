@@ -306,6 +306,46 @@ Here is an example config where you can see the exclude and include options in a
 }
 ```
 
+## CSS Defaults
+
+This package provides several optional CSS modules that offer default styling for common HTML elements.
+They are optimized for TailwindCSS v4 and Hyvä Themes and serve as lightweight alternatives to official TailwindCSS plugins.
+
+To use a module, add the corresponding `@import` rule to your stylesheet.
+
+```css
+/* Import all modules at once */
+@import "@hyva-themes/hyva-modules/css";
+```
+
+Alternatively, you can import modules individually as needed.
+
+### Prose
+
+A lightweight, unopinionated alternative to the `@tailwindcss/typography` plugin.
+It provides sensible typographic defaults for long-form content (like CMS blocks) without imposing specific colors or a `max-width`.
+
+```css
+@import "@hyva-themes/hyva-modules/css/prose.css";
+```
+
+### Forms
+
+A minimal alternative to the `@tailwindcss/forms` plugin, providing clean, basic styles for form elements.
+
+```css
+@import "@hyva-themes/hyva-modules/css/forms.css";
+```
+
+### Fallback
+
+This module restores utility classes from older TailwindCSS versions (v2/v3) that have been removed in v4.
+It ensures backward compatibility with older Hyvä compatibility modules and helps prevent compilation errors during upgrades.
+
+```css
+@import "@hyva-themes/hyva-modules/css/fallback.css";
+```
+
 ## License
 
 Hyvä Themes - https://hyva.io  

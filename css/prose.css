@@ -1,0 +1,153 @@
+/**
+ * Cleaner and extandable version of the Tailwind Typography plugin
+ * This version allows for easy customization and extension without the need for complex overrides.
+ * allowing tailwind utilities to be used directly in the prose classes.
+ *
+ * Defaults inspired by @fylgja/base
+ */
+
+@utility prose {
+    --text-flow: 1em 1rem;
+    --separator-flow: 2.5em;
+    --list-flow: 0.5em;
+    --h-color: initial;
+    --h-family: initial;
+    --h-size: 1.125em;
+    --h-weight: 600;
+    --h-line: 1.1;
+    --h1-size: 3em;
+    --h2-size: 2em;
+    --h3-size: 1.625em;
+    --h4-size: 1.375em;
+    --marker-color: var(--color-primary);
+    --link-color: var(--color-primary);
+    --link-weight: 500;
+    --blockquote-color: var(--color-primary);
+    --table-py: --spacing(3);
+    --table-px: --spacing(2);
+    --table-stroke: var(--color-gray-400);
+    --table-bg: var(--color-bg);
+    --table-color: var(--color-text);
+
+    :where(h1, h2, h3, h4, h5, h6, p, dl, ul, ol, pre, hgroup) {
+        margin-block: var(--text-flow);
+    }
+
+    :where(blockquote, figure, hr) {
+        margin-block: var(--separator-flow);
+        margin-inline: 0;
+    }
+
+    :where([class~="lead"]) {
+        font-size: 1.25em;
+    }
+
+    :where(h1, h2, h3, h4, h5, h6) {
+        color: var(--h-color);
+        font-family: var(--h-family);
+        font-size: var(--h-size);
+        font-weight: var(--h-weight);
+        line-height: var(--h-line);
+        text-wrap: balance;
+    }
+
+    :where(h1) {
+        --h-size: var(--h1-size);
+    }
+
+    :where(h2) {
+        --h-size: var(--h2-size);
+    }
+
+    :where(h3) {
+        --h-size: var(--h3-size);
+    }
+
+    :where(h4) {
+        --h-size: var(--h4-size);
+    }
+
+    ::marker {
+        color: var(--marker-color);
+    }
+
+    :where(ul, ol) {
+        list-style: revert;
+        padding-inline-start: 2em;
+    }
+
+    /**
+     * TODO: ol list styles should be handled natively
+     * Do lack of support case based attr's
+     * Tailwind should not unset the list style if the type is set
+     * MR on TailwindCSS side is needed
+     */
+    :where(ol[type="a"]) {
+        list-style-type: lower-alpha;
+    }
+
+    :where(ol[type="i"]) {
+        list-style-type: lower-roman;
+    }
+
+    :where(ol[type="1"]) {
+        list-style-type: decimal;
+    }
+
+    :where(blockquote) {
+        border-inline-start: 4px solid var(--blockquote-color);
+        padding-inline-start: 1.5em;
+        padding-block: 0.25em;
+    }
+
+    :where(:any-link) {
+        color: var(--link-color);
+        font-weight: var(--link-weight);
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    :where(table) {
+        border-collapse: separate;
+        border-spacing: 0;
+        border-color: var(--table-stroke);
+    }
+
+    :where(thead, tbody, tfoot, tr, th, td) {
+        border-color: inherit;
+        text-align: inherit;
+    }
+
+    :where(th, td) {
+        padding-block: var(--table-py);
+        padding-inline: var(--table-px);
+        background: var(--table-bg);
+        color: var(--table-color);
+    }
+
+    :where(tr + tr :is(th, td)) {
+        border-block-start-width: 1px;
+    }
+
+    :where(thead tr:last-child :is(th, td)) {
+        border-block-end-width: 2px;
+    }
+
+    :where(tfoot tr:first-child :is(th, td)) {
+        border-block-start-width: 2px;
+    }
+
+    :where(table:not(:has(.table-wrapper, [class*="overflow-"]))) {
+        word-break: break-all;
+    }
+
+    > :where(:first-child) {
+        margin-block-start: 0;
+    }
+
+    > :where(:last-child) {
+        margin-block-end: 0;
+    }
+}
