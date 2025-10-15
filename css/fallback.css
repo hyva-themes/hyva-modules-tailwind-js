@@ -1,0 +1,57 @@
+/**
+ * Legacy Utilities from Tailwind v2 that where supported in v3 and dropped in v4
+ * We have kept support for 3de party modules but it is best to avoid using these utilities
+ * @source https://tailwindcss.com/docs/upgrade-guide#removed-deprecated-utilities
+ */
+
+@utility bg-opacity-* {
+    --tw-bg-opacity: --value(integer);
+}
+
+@utility text-opacity-* {
+    --tw-text-opacity: --value(integer);
+}
+
+@utility border-opacity-* {
+    --tw-border-opacity: --value(integer);
+}
+
+@utility divide-opacity-* {
+    --tw-divide-opacity: --value(integer);
+}
+
+@utility ring-opacity-* {
+    --tw-ring-opacity: --value(integer);
+}
+
+@utility placeholder-opacity-* {
+    --tw-placeholder-opacity: --value(integer);
+}
+
+@utility flex-shrink-0 {
+    flex-shrink: 0;
+}
+
+@utility flex-shrink {
+    flex-shrink: 1;
+}
+
+@utility flex-grow-0 {
+    flex-grow: 0;
+}
+
+@utility flex-grow {
+    flex-grow: 1;
+}
+
+@utility overflow-ellipsis {
+    text-overflow: ellipsis;
+}
+
+@utility decoration-slice {
+    box-decoration-break: clone;
+}
+
+@utility decoration-clone {
+    box-decoration-break: slice;
+}

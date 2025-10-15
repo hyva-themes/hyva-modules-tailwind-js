@@ -1,0 +1,126 @@
+/**
+ * Port of @tailwindcss/forms v0.5.10
+ * Optimized for Hyvä Themes with TailwindCSS v4
+ * With some improvements from @fylgja/base v2.1.1 to make the forms smaller and easier to adjust
+ *
+ * Most form resets are already present in the Tailwind v4 preflight and so don't need to be redeclared,
+ * which is something the @tailwindcss/forms plugin does.
+ * https://github.com/tailwindlabs/tailwindcss/blob/main/packages/tailwindcss/preflight.css
+ */
+
+@theme {
+    --form-py: --spacing(2);
+    --form-px: --spacing(3);
+    --form-radius: var(--radius-sm);
+    --form-stroke: currentcolor;
+    --form-bg: #fff;
+    --form-color: currentcolor;
+    --form-active-color: var(--color-blue-600);
+
+    --select-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="hsl(0 0% 0%)"><path d="m6 9 6 6 6-6"/></svg>');
+    --select-icon-size: 1.25em;
+    --select-icon-offset: 0.8rem;
+}
+
+@layer base {
+    :is(
+        input:where(:not([type])),
+        [type="text"],
+        [type="email"],
+        [type="url"],
+        [type="password"],
+        [type="number"],
+        [type="date"],
+        [type="datetime-local"],
+        [type="month"],
+        [type="search"],
+        [type="tel"],
+        [type="time"],
+        [type="week"],
+        textarea,
+        select
+    ) {
+        appearance: none;
+        padding-block: var(--form-py);
+        padding-inline: var(--form-px);
+        border-radius: var(--form-radius);
+        border-width: 1px;
+        border-color: var(--form-stroke);
+        background-color: var(--form-bg);
+        color: var(--form-color);
+
+        &:focus {
+            border-color: var(--form-active-color);
+            outline-color: var(--form-active-color);
+        }
+    }
+
+    select:where(:not([size]:not([size="1"]), [multiple])) {
+        --_icon-position: right;
+        padding-inline-end: calc(
+            var(--select-icon-size) + var(--select-icon-offset) + 0.5ch
+        );
+        background: var(--select-icon) var(--form-bg) var(--_icon-position)
+            var(--select-icon-offset) center/var(--select-icon-size) no-repeat;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+
+        &:dir(rtl) {
+            --_icon-position: left;
+        }
+    }
+
+    :is([type="checkbox"], [type="radio"]) {
+        appearance: none;
+        display: inline-block;
+        padding: 0;
+        border-width: 2px;
+        border-color: var(--form-stroke);
+        background-color: var(--form-bg);
+        color: var(--form-color);
+        print-color-adjust: exact;
+        vertical-align: middle;
+        background-origin: border-box;
+        user-select: none;
+        flex-shrink: 0;
+        block-size: --spacing(4.5);
+        inline-size: --spacing(4.5);
+
+        &:focus {
+            outline-color: var(--form-active-color);
+        }
+
+        &:focus,
+        &:checked {
+            border-color: var(--form-active-color);
+        }
+    }
+
+    [type="checkbox"] {
+        &:checked,
+        &:indeterminate {
+            border-color: transparent;
+            background: var(--form-active-color, currentColor) center/contain
+                no-repeat;
+        }
+
+        &:indeterminate {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 16'%3E%3Cpath stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8h8'/%3E%3C/svg%3E");
+        }
+
+        &:checked {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E");
+        }
+    }
+
+    [type="radio"] {
+        border-radius: 50%;
+
+        &:checked {
+            border-color: transparent;
+            background: var(--form-active-color, currentColor) center/contain
+                no-repeat;
+            background-image: url("data:image/svg+xml,background-image: url('data:image/svg+xml,%253Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%253E%253Ccircle cx='8' cy='8' r='3'/%253E%253C/svg%253E');");
+        }
+    }
+}

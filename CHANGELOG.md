@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 [unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.1.1...HEAD
+### Added
+
+- Custom Tailwind v4 Prose CSS, that is way smaller and easier to customize.
+- Tailwind v2 and v3 fallback styles for Tailwind v4.
 
 ## [1.1.1] - 2025-08-29
 
