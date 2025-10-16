@@ -2,11 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-[unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.1...HEAD
+[unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.2...HEAD
+
+## [1.2.2] - 2025-10-16
+
+[1.2.2]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.1...1.2.2
+
+### Changed
+
+- Make the prose table color not specific to a config, use browser colors by default
+
+### Fixed
+
+- Encode issue for radio icon
 
 ## [1.2.1] - 2025-10-15
 
