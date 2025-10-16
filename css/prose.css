@@ -26,8 +26,8 @@
     --table-py: --spacing(3);
     --table-px: --spacing(2);
     --table-stroke: var(--color-gray-400);
-    --table-bg: var(--color-bg);
-    --table-color: var(--color-text);
+    --table-bg: canvas;
+    --table-color: canvastext;
 
     :where(h1, h2, h3, h4, h5, h6, p, dl, ul, ol, pre, hgroup) {
         margin-block: var(--text-flow);
