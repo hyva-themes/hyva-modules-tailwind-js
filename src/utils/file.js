@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { cwd } from "node:process";
+import { consoleWarn } from "./console.js";
 
 /**
  * Finds the base directory of the project by checking for the presence of
