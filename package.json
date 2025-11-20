@@ -1,6 +1,6 @@
 {
   "name": "@hyva-themes/hyva-modules",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Hyvä-themes TailwindCSS utility functions",
   "type": "module",
   "homepage": "https://hyva.io",

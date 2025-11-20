@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-[unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.2...HEAD
+[unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.3...HEAD
+
+## [1.2.3] - 2025-11-20
+
+[1.2.3]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.2...1.2.3
+
+### Fixed
+
+- Missing import in the `util/file.js` (thanks to @julien-desiage)
 
 ## [1.2.2] - 2025-10-16
 
