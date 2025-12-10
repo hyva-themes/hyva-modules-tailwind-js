@@ -65,6 +65,15 @@ const { importStatements, sourceStatements, moduleStatements } =
         (acc, theme) => {
             if (!theme.src) return acc;
 
+            if (theme.src.startsWith("./") || theme.src.startsWith("../")) {
+                consoleWarn(
+                    [
+                        `Warning: Do not use relative paths (e.g., "./" or "../") in the "src" configuration for ${theme.src}`,
+                        '"hyva-sources" automatically resolves all paths from the Magento 2 project root.',
+                    ].join("\n")
+                );
+            }
+
             const themePath = getRelativePath(theme.src);
             const themeCSSPath = getRelativePath(theme.src, "generated");
 
