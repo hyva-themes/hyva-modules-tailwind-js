@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.3...HEAD
 
+### Added
+- Debug helper for .gitignore issues with Tailwind v4 and sources
+
 ## [1.2.3] - 2025-11-20
 
 [1.2.3]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.2...1.2.3

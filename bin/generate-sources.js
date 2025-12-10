@@ -6,6 +6,7 @@ import path from "node:path";
 import { cwd, exit } from "node:process";
 import {
     consoleError,
+    consoleWarn,
     basePath,
     getRelativePath,
     getJsonFile,
@@ -35,6 +36,29 @@ const filteredModules =
     }) ?? [];
 const includedModules = hyvaConfig.tailwind?.include ?? [];
 const hyvaModules = [...filteredModules, ...includedModules];
+
+(async () => {
+    try {
+        const gitignorePath = path.join(basePath, ".gitignore");
+        if (existsSync(gitignorePath)) {
+            const gitignore = await fs.readFile(gitignorePath, "utf-8");
+            if (gitignore.split("\n").some((line) => line.trim() === "*")) {
+                consoleWarn(
+                    [
+                        "",
+                        'Warning: Your root .gitignore file contains a single "*" character, which is an allow-list pattern.',
+                        "This pattern is not supported by Tailwind CSS v4 for content scanning.",
+                        "Tailwind will not be able to find your template files, resulting in missing CSS.",
+                        "Please use a traditional exclude-list in your .gitignore file.",
+                        "",
+                    ].join("\n")
+                );
+            }
+        }
+    } catch (error) {
+        // Fail silently.
+    }
+})();
 
 const { importStatements, sourceStatements, moduleStatements } =
     hyvaModules?.reduce(
