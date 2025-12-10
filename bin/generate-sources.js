@@ -63,6 +63,8 @@ const hyvaModules = [...filteredModules, ...includedModules];
 const { importStatements, sourceStatements, moduleStatements } =
     hyvaModules?.reduce(
         (acc, theme) => {
+            if (!theme.src) return acc;
+
             const themePath = getRelativePath(theme.src);
             const themeCSSPath = getRelativePath(theme.src, "generated");
 
