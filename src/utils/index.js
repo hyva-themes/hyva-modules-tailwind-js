@@ -1,3 +1,9 @@
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 import { consoleError, consoleSuccess, consoleWarn } from "./console.js";
 import { getBasePath, basePath, getRelativePath, getJsonFile } from "./file.js";
 export {

@@ -346,10 +346,9 @@ It ensures backward compatibility with older Hyvä compatibility modules and hel
 @import "@hyva-themes/hyva-modules/css/fallback.css";
 ```
 
-## License
+### License
 
-Hyvä Themes - https://hyva.io  
-Copyright © Hyvä Themes 2022-present. All rights reserved.  
-This library is distributed under the BSD-3-Clause license.
+This package is licensed under the **Open Software License (OSL 3.0)**.
 
-See the [LICENSE.md](LICENSE.md) file for more information.
+* **Copyright:** Copyright © 2020-present Hyvä Themes. All rights reserved.
+* **License Text (OSL 3.0):** The full text of the OSL 3.0 license can be found in the `LICENSE.txt` file within this package, and is also available online at [http://opensource.org/licenses/osl-3.0.php](http://opensource.org/licenses/osl-3.0.php).

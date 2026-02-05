@@ -5,7 +5,7 @@
   "type": "module",
   "homepage": "https://hyva.io",
   "author": "Hyvä Themes BV",
-  "license": "BSD-3-Clause",
+  "license": "OSL-3.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/hyva-themes/hyva-modules-tailwind-js.git"

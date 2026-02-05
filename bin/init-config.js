@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+/**
+ * Hyvä Themes - https://hyva.io
+ * Copyright © Hyvä Themes. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 import fs from "node:fs/promises";
 import { constants } from "node:fs";
