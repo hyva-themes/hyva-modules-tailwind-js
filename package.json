@@ -35,7 +35,7 @@
     "hyva-tokens": "./bin/generate-tokens.js"
   },
   "scripts": {
-    "test": "jest"
+    "test": "node --test tests/*.test.js"
   },
   "files": [
     "bin",
@@ -45,8 +45,5 @@
   "dependencies": {
     "@fylgja/props-builder": "^2.1.0",
     "deepmerge": "^4.3.1"
-  },
-  "devDependencies": {
-    "jest": "^29.7.0"
   }
 }
