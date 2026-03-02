@@ -8,6 +8,8 @@
  * https://github.com/tailwindlabs/tailwindcss/blob/main/packages/tailwindcss/preflight.css
  */
 
+@import "./utilities/form.css";
+
 @theme {
     --form-py: --spacing(2);
     --form-px: --spacing(3);
@@ -22,56 +24,28 @@
     --select-icon-offset: 0.8rem;
 }
 
-@utility form-input-field {
-    appearance: none;
-    padding-block: var(--form-py);
-    padding-inline: var(--form-px);
-    border-radius: var(--form-radius);
-    border-width: 1px;
-    border-color: var(--form-stroke);
-    background-color: var(--form-bg);
-    color: var(--form-color);
-}
-
-@utility form-input-control {
-    appearance: none;
-    flex-shrink: 0;
-    display: inline-block;
-    block-size: --spacing(4);
-    inline-size: --spacing(4);
-    padding: 0;
-    border-width: 2px;
-    border-color: var(--form-stroke);
-    background-color: var(--form-bg);
-    color: var(--form-color);
-    background-origin: border-box;
-    vertical-align: middle;
-    user-select: none;
-    print-color-adjust: exact;
-}
-
 @layer base {
     :is(
-            input:where(:not([type])),
-            [type="text"],
-            [type="email"],
-            [type="url"],
-            [type="password"],
-            [type="number"],
-            [type="date"],
-            [type="datetime-local"],
-            [type="month"],
-            [type="search"],
-            [type="tel"],
-            [type="time"],
-            [type="week"],
-            textarea,
-            select,
-            .form-input,
-            .form-textarea,
-            .form-select,
-            .form-multiselect
-        ) {
+        input:where(:not([type])),
+        [type="text"],
+        [type="email"],
+        [type="url"],
+        [type="password"],
+        [type="number"],
+        [type="date"],
+        [type="datetime-local"],
+        [type="month"],
+        [type="search"],
+        [type="tel"],
+        [type="time"],
+        [type="week"],
+        textarea,
+        select,
+        .form-input,
+        .form-textarea,
+        .form-select,
+        .form-multiselect
+    ) {
         @apply form-input-field;
 
         &:focus {
