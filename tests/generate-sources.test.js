@@ -29,6 +29,19 @@ const runGenerateSources = () =>
         });
     });
 
+const runGenerateSourcesWithOutput = () =>
+    new Promise((resolve, reject) => {
+        const child = spawn(process.execPath, [binPath], { cwd: fixtureDir });
+        let stdout = "";
+        let stderr = "";
+        child.stdout.on("data", (data) => (stdout += data));
+        child.stderr.on("data", (data) => (stderr += data));
+        child.on("close", (code) => {
+            if (code === 0) resolve(stdout);
+            else reject(new Error(`Process exited with code ${code}\n${stderr}`));
+        });
+    });
+
 const keep = process.argv.includes("--keep");
 
 before(async () => {
@@ -68,4 +81,83 @@ test("generates @source statement for extension module", async () => {
         css.includes('@source "../../app/code/Vendor/HyvaModule"'),
         "should contain @source glob for module"
     );
+});
+
+test("uses frontend as default area when no area is configured", async () => {
+    const tailwindDir = resolve(magentaRootDir, "app/code/Vendor/HyvaModule/view/frontend/tailwind");
+    await mkdir(tailwindDir, { recursive: true });
+    await writeFile(resolve(tailwindDir, "module.css"), "/* module */");
+    try {
+        await runGenerateSources();
+        const css = await readFile(generatedFile, "utf8");
+        assert.ok(
+            css.includes("view/frontend/tailwind/module.css"),
+            "should use frontend area by default"
+        );
+    } finally {
+        await rm(resolve(magentaRootDir, "app/code/Vendor/HyvaModule/view"), { recursive: true });
+    }
+});
+
+test("uses configured area for module paths", async () => {
+    const tailwindDir = resolve(magentaRootDir, "app/code/Vendor/HyvaModule/view/adminhtml/tailwind");
+    await mkdir(tailwindDir, { recursive: true });
+    await writeFile(resolve(tailwindDir, "module.css"), "/* module */");
+    await writeFile(
+        resolve(fixtureDir, "hyva.config.json"),
+        JSON.stringify({ tailwind: { area: "adminhtml" } }, null, 4)
+    );
+    try {
+        await runGenerateSources();
+        const css = await readFile(generatedFile, "utf8");
+        assert.ok(
+            css.includes("view/adminhtml/tailwind/module.css"),
+            "should use configured adminhtml area"
+        );
+    } finally {
+        await rm(resolve(magentaRootDir, "app/code/Vendor/HyvaModule/view"), { recursive: true });
+        await writeFile(resolve(fixtureDir, "hyva.config.json"), JSON.stringify({}, null, 4));
+    }
+});
+
+test("warns when a .gitignore at the project root contains a lone *", async () => {
+    const gitignorePath = resolve(magentaRootDir, ".gitignore");
+    await writeFile(gitignorePath, "*\n");
+    try {
+        const stdout = await runGenerateSourcesWithOutput();
+        assert.ok(
+            stdout.includes("allow-list pattern"),
+            "should warn about lone * in .gitignore"
+        );
+    } finally {
+        await rm(gitignorePath);
+    }
+});
+
+test("does not warn when .gitignore does not contain a lone *", async () => {
+    const gitignorePath = resolve(magentaRootDir, ".gitignore");
+    await writeFile(gitignorePath, "node_modules\n*.log\n");
+    try {
+        const stdout = await runGenerateSourcesWithOutput();
+        assert.ok(
+            !stdout.includes("allow-list pattern"),
+            "should not warn for a normal .gitignore"
+        );
+    } finally {
+        await rm(gitignorePath);
+    }
+});
+
+test("warns when a .gitignore above the project root contains a lone *", async () => {
+    const gitignorePath = resolve(magentaRootDir, "../.gitignore");
+    await writeFile(gitignorePath, "*\n");
+    try {
+        const stdout = await runGenerateSourcesWithOutput();
+        assert.ok(
+            stdout.includes("allow-list pattern"),
+            "should warn when lone * is found in a parent directory .gitignore"
+        );
+    } finally {
+        await rm(gitignorePath);
+    }
 });

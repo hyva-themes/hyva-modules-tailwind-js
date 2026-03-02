@@ -5,7 +5,7 @@
  */
 
 import { consoleError, consoleSuccess, consoleWarn } from "./console.js";
-import { getBasePath, basePath, getRelativePath, getJsonFile } from "./file.js";
+import { getBasePath, basePath, getRelativePath, getJsonFile, warnOnGitignoreWildcard } from "./file.js";
 export {
     consoleError,
     consoleSuccess,
@@ -14,6 +14,7 @@ export {
     basePath,
     getRelativePath,
     getJsonFile,
+    warnOnGitignoreWildcard,
 };
 
 export const cssVarRegex = /var\(--([a-zA-Z0-9-]+)\)/g;

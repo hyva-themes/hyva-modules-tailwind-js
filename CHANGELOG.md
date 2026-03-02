@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The `.gitignore` wildcard check now scans up the full directory tree (up to `$HOME`) instead of only the project root, so allow-list patterns in parent directories are also detected.
 - Allow form utilities to be imported separately for custom form setups, improving reusability with the theme's input-group add-ons.
 - `from-tokens.js` and `to-style.js` are now sourced directly from `@fylgja/props-builder` instead of maintained as local copies.
 - Replaced Jest with Node.js built-in test runner (`node:test`), removing the Jest dev dependency.

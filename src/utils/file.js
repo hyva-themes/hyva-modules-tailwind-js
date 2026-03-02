@@ -6,7 +6,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { cwd, exit } from "node:process";
+import { cwd, exit, env } from "node:process";
 import { consoleError, consoleWarn } from "./console.js";
 
 /**
@@ -48,6 +48,46 @@ export const getRelativePath = (src, targetFolder = "") => {
     const fromPath = targetFolder ? path.join(cwd(), targetFolder) : cwd();
     return path.relative(fromPath, path.join(basePath, src));
 };
+
+/**
+ * Walks up the directory tree from startDir to $HOME, checking each .gitignore
+ * for a lone "*" allow-list pattern that is incompatible with Tailwind CSS v4.
+ * Warns on the first match found. Fails silently on any error.
+ *
+ * @param {string} startDir - The directory to start scanning from.
+ * @returns {Promise<void>}
+ */
+export async function warnOnGitignoreWildcard(startDir) {
+    try {
+        const home = env.HOME ?? env.USERPROFILE ?? null;
+        let dir = startDir;
+        while (dir) {
+            const gitignorePath = path.join(dir, ".gitignore");
+            if (fs.existsSync(gitignorePath)) {
+                const gitignore = await fs.promises.readFile(gitignorePath, "utf-8");
+                if (gitignore.split("\n").some((line) => line.trim() === "*")) {
+                    consoleWarn(
+                        [
+                            "",
+                            `Warning: A .gitignore file at "${gitignorePath}" contains a single "*" character, which is an allow-list pattern.`,
+                            "This pattern is not supported by Tailwind CSS v4 for content scanning.",
+                            "Tailwind will not be able to find your template files, resulting in missing CSS.",
+                            "Please use a traditional exclude-list in your .gitignore file.",
+                            "",
+                        ].join("\n")
+                    );
+                    break;
+                }
+            }
+            if (home && dir === home) break;
+            const parent = path.dirname(dir);
+            if (parent === dir) break;
+            dir = parent;
+        }
+    } catch {
+        // Fail silently.
+    }
+}
 
 /**
  * Reads a JSON file and returns its parsed content.
