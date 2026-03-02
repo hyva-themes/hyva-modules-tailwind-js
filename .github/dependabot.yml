@@ -5,14 +5,3 @@ updates:
     schedule:
       interval: monthly
     open-pull-requests-limit: 5
-    ignore:
-      - dependency-name: "*"
-        dependency-type: development
-        update-types:
-          - version-update:semver-major
-    groups:
-      dev-dependencies:
-        dependency-type: development
-        update-types:
-          - minor
-          - patch
