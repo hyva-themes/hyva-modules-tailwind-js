@@ -138,6 +138,18 @@ Here is an example config where you can see the exclude and include options in a
 }
 ```
 
+If you want to keep a module's `@source` for Tailwind class scanning but skip its CSS imports, add `keepSource: true` to the exclude entry:
+
+```json
+{
+    "tailwind": {
+        "exclude": [
+            { "src": "vendor/hyva-themes/magento2-hyva-checkout/src", "keepSource": true }
+        ]
+    }
+}
+```
+
 By default, module CSS files are resolved from the `view/frontend` area. You can change this with `tailwind.area` — for example, to target an admin theme:
 
 ```json

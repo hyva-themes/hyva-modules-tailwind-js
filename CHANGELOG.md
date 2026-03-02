@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (defaults to `frontend`, e.g. set to `adminhtml` for admin themes).
 - Added `includeExternalModules` option to `hyva.config.json` tailwind config,
   allowing the auto-inclusion of external modules from `hyva-themes.json` to be disabled.
+- Added `keepSource` flag to `exclude` entries in `hyva.config.json`,
+  allowing a module's `@source` statement to be preserved while its CSS imports are skipped.
 - Added Prose element modifier variants to `prose.css` (e.g. `prose-headings:`,
   `prose-a:`, `prose-p:`), allowing Tailwind utilities to be scoped to specific
   child elements inside a `.prose` block.

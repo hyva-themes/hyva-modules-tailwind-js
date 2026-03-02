@@ -114,6 +114,35 @@ test("uses configured area for module paths", async () => {
     }
 });
 
+test("excludes module with keepSource preserves @source but skips CSS imports", async () => {
+    const tailwindDir = resolve(magentaRootDir, "app/code/Vendor/HyvaModule/view/frontend/tailwind");
+    await mkdir(tailwindDir, { recursive: true });
+    await writeFile(resolve(tailwindDir, "module.css"), "/* module */");
+    await writeFile(
+        resolve(fixtureDir, "hyva.config.json"),
+        JSON.stringify(
+            { tailwind: { exclude: [{ src: "app/code/Vendor/HyvaModule", keepSource: true }] } },
+            null,
+            4
+        )
+    );
+    try {
+        await runGenerateSources();
+        const css = await readFile(generatedFile, "utf8");
+        assert.ok(
+            css.includes('@source "../../app/code/Vendor/HyvaModule"'),
+            "should still contain @source for excluded module"
+        );
+        assert.ok(
+            !css.includes("module.css"),
+            "should not contain CSS import for excluded module"
+        );
+    } finally {
+        await rm(resolve(magentaRootDir, "app/code/Vendor/HyvaModule/view"), { recursive: true });
+        await writeFile(resolve(fixtureDir, "hyva.config.json"), JSON.stringify({}, null, 4));
+    }
+});
+
 test("warns when a .gitignore contains a lone *", async () => {
     const gitignorePath = resolve(magentaRootDir, ".gitignore");
     await writeFile(gitignorePath, "*\n");

@@ -36,12 +36,16 @@ const hyvaConfig = getJsonFile(hyvaThemesJsonConfig);
 const hyvaArea = hyvaConfig.tailwind?.area ?? "frontend";
 const hyvaIncludeExternalModules = hyvaConfig.tailwind?.includeExternalModules !== false;
 const filteredModules = hyvaIncludeExternalModules
-    ? includeConfig.extensions?.filter((module) => {
-          const isExcluded = hyvaConfig.tailwind?.exclude?.some(
-              (excluded) => excluded.src === module.src
-          );
-          return !isExcluded;
-      }) ?? []
+    ? includeConfig.extensions
+          ?.map((module) => {
+              const excludeEntry = hyvaConfig.tailwind?.exclude?.find(
+                  (excluded) => excluded.src === module.src
+              );
+              if (!excludeEntry) return module;
+              if (excludeEntry.keepSource) return { ...module, cssExcluded: true };
+              return null;
+          })
+          .filter(Boolean) ?? []
     : [];
 const includedModules = hyvaConfig.tailwind?.include ?? [];
 const hyvaModules = [...filteredModules, ...includedModules];
@@ -77,7 +81,9 @@ const { importStatements, sourceStatements, moduleStatements } =
             const importPath = (cssPath) =>
                 `@import "${themeCSSPath}/view/${hyvaArea}/tailwind/${cssPath}";\n`;
 
-            if (existsSync(tailwindCSSPath)) {
+            if (theme.cssExcluded) {
+                acc.sourceStatements += `@source "${themeCSSPath}";\n`;
+            } else if (existsSync(tailwindCSSPath)) {
                 acc.moduleStatements += importPath("module.css");
             } else {
                 acc.sourceStatements += `@source "${themeCSSPath}";\n`;
