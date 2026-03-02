@@ -7,7 +7,7 @@
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { readFile, rm } from "node:fs/promises";
+import { readFile, rm, mkdir, writeFile } from "node:fs/promises";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -28,13 +28,32 @@ const runGenerateTokens = () =>
         });
     });
 
+const keep = process.argv.includes("--keep");
+
 before(async () => {
-    await rm(generatedDir, { recursive: true, force: true });
+    await rm(fixtureDir, { recursive: true, force: true });
+    await mkdir(fixtureDir, { recursive: true });
+    await writeFile(resolve(fixtureDir, "hyva.config.json"), JSON.stringify({
+        tokens: {
+            cssSelector: "@theme",
+            values: {
+                color: {
+                    primary: "#ff0000",
+                    secondary: "#00ff00",
+                },
+                fontSize: {
+                    sm: "0.875rem",
+                    base: "1rem",
+                    lg: "1.125rem",
+                },
+            },
+        },
+    }, null, 4));
     await runGenerateTokens();
 });
 
 after(async () => {
-    await rm(generatedDir, { recursive: true, force: true });
+    if (!keep) await rm(fixtureDir, { recursive: true, force: true });
 });
 
 test("generates hyva-tokens.css", async () => {
