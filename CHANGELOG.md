@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.4...HEAD
 
+### Added
+
+- Introduced customizable Prose Modifiers, offering a lightweight alternative to the default Tailwind `prose` utilities with distinct internal implementations.
+- Added `mediaDark` option to `hyva.config.json` tokens config, allowing customization of the dark mode media query used when generating `hyva-tokens.css`.
+- Added GitHub Actions CI workflow to run tests on push and pull requests to `main`.
+
+### Changed
+
+- Allow form utilities to be imported separately for custom form setups, improving reusability with the theme's input-group add-ons.
+- `from-tokens.js` and `to-style.js` are now sourced directly from `@fylgja/props-builder` instead of maintained as local copies.
+- Replaced Jest with Node.js built-in test runner (`node:test`), removing the Jest dev dependency.
+- Publish workflow now requires all tests to pass before publishing to npm.
+
+### Fixed
+
+- Fixed an issue where invalid `hyva.config.json` files did not produce error messages.
+
 ## [1.2.4] - 2025-11-20
 
 [1.2.4]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.3...1.2.4
@@ -132,4 +149,3 @@ Fixes and updates
 ## 1.0.0 - 2022-04-15
 
 Initial Release 🎉
-
