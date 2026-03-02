@@ -43,6 +43,7 @@
     "css"
   ],
   "dependencies": {
+    "@fylgja/props-builder": "^2.1.0",
     "deepmerge": "^4.3.1"
   },
   "devDependencies": {
