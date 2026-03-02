@@ -1,3 +1,7 @@
-node_modules/
 .idea
+.claude
+.gemini
+
+node_modules/
+
 tests/fixtures/
