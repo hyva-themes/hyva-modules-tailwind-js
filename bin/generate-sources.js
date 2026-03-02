@@ -34,13 +34,15 @@ const includeConfig = getJsonFile(`app/etc/${hyvaThemesJsonInclude}`, {
 });
 const hyvaConfig = getJsonFile(hyvaThemesJsonConfig);
 const hyvaArea = hyvaConfig.tailwind?.area ?? "frontend";
-const filteredModules =
-    includeConfig.extensions?.filter((module) => {
-        const isExcluded = hyvaConfig.tailwind?.exclude?.some(
-            (excluded) => excluded.src === module.src
-        );
-        return !isExcluded;
-    }) ?? [];
+const hyvaIncludeExternalModules = hyvaConfig.tailwind?.includeExternalModules !== false;
+const filteredModules = hyvaIncludeExternalModules
+    ? includeConfig.extensions?.filter((module) => {
+          const isExcluded = hyvaConfig.tailwind?.exclude?.some(
+              (excluded) => excluded.src === module.src
+          );
+          return !isExcluded;
+      }) ?? []
+    : [];
 const includedModules = hyvaConfig.tailwind?.include ?? [];
 const hyvaModules = [...filteredModules, ...includedModules];
 

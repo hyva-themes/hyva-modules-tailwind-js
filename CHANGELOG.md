@@ -11,22 +11,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added `area` option to `hyva.config.json` tailwind config, allowing customization of the Magento view area used when resolving module CSS paths (defaults to `frontend`, e.g. set to `adminhtml` for admin themes).
-- Introduced customizable Prose Modifiers, offering a lightweight alternative to the default Tailwind `prose` utilities with distinct internal implementations.
-- Added `mediaDark` option to `hyva.config.json` tokens config, allowing customization of the dark mode media query used when generating `hyva-tokens.css`.
+- Added `area` option to `hyva.config.json` tailwind config,
+  allowing customization of the Magento view area used when resolving module CSS paths
+  (defaults to `frontend`, e.g. set to `adminhtml` for admin themes).
+- Added `includeExternalModules` option to `hyva.config.json` tailwind config,
+  allowing the auto-inclusion of external modules from `hyva-themes.json` to be disabled.
+- Added Prose element modifier variants to `prose.css` (e.g. `prose-headings:`,
+  `prose-a:`, `prose-p:`), allowing Tailwind utilities to be scoped to specific
+  child elements inside a `.prose` block.
+- Added `mediaDark` option to `hyva.config.json` tokens config,
+  allowing customization of the dark mode media query used when generating `hyva-tokens.css`.
 - Added GitHub Actions CI workflow to run tests on push and pull requests to `main`.
 
 ### Changed
 
-- The `.gitignore` wildcard check now scans up the full directory tree (up to `$HOME`) instead of only the project root, so allow-list patterns in parent directories are also detected.
-- Allow form utilities to be imported separately for custom form setups, improving reusability with the theme's input-group add-ons.
+- The `.gitignore` wildcard check now scans up the full directory tree (up to `$HOME`) instead of only the project root,
+  so allow-list patterns in parent directories are also detected.
+- Allow form utilities to be imported separately for custom form setups,
+  improving reusability with the theme's input-group add-ons.
 - `from-tokens.js` and `to-style.js` are now sourced directly from `@fylgja/props-builder` instead of maintained as local copies.
 - Replaced Jest with Node.js built-in test runner (`node:test`), removing the Jest dev dependency.
 - Publish workflow now requires all tests to pass before publishing to npm.
 
 ### Fixed
 
-- Fixed an issue where invalid `hyva.config.json` files did not produce error messages.
+- Fixed an issue where invalid `hyva.config.json` files did not
+  produce error messages.
 
 ## [1.2.4] - 2025-11-20
 

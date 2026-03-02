@@ -42,8 +42,6 @@ const runGenerateSourcesWithOutput = () =>
         });
     });
 
-const keep = process.argv.includes("--keep");
-
 before(async () => {
     await rm(magentaRootDir, { recursive: true, force: true });
     await mkdir(resolve(magentaRootDir, "app/etc"), { recursive: true });
@@ -59,7 +57,7 @@ before(async () => {
 });
 
 after(async () => {
-    if (!keep) await rm(magentaRootDir, { recursive: true, force: true });
+    await rm(magentaRootDir, { recursive: true, force: true });
 });
 
 test("generates hyva-source.css", async () => {
@@ -116,6 +114,23 @@ test("uses configured area for module paths", async () => {
         );
     } finally {
         await rm(resolve(magentaRootDir, "app/code/Vendor/HyvaModule/view"), { recursive: true });
+        await writeFile(resolve(fixtureDir, "hyva.config.json"), JSON.stringify({}, null, 4));
+    }
+});
+
+test("excludes hyva-themes.json extensions when includeExternalModules is false", async () => {
+    await writeFile(
+        resolve(fixtureDir, "hyva.config.json"),
+        JSON.stringify({ tailwind: { includeExternalModules: false } }, null, 4)
+    );
+    try {
+        await runGenerateSources();
+        const css = await readFile(generatedFile, "utf8");
+        assert.ok(
+            !css.includes("app/code/Vendor/HyvaModule"),
+            "should not include hyva-themes.json extensions when includeExternalModules is false"
+        );
+    } finally {
         await writeFile(resolve(fixtureDir, "hyva.config.json"), JSON.stringify({}, null, 4));
     }
 });

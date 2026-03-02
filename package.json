@@ -35,8 +35,7 @@
     "hyva-tokens": "./bin/generate-tokens.js"
   },
   "scripts": {
-    "test": "node --test tests/*.test.js",
-    "test:keep": "node --test tests/*.test.js --keep"
+    "test": "node --test tests/*.test.js"
   },
   "files": [
     "bin",

@@ -21,9 +21,189 @@ npm install @hyva-themes/hyva-modules
 
 ## Usage
 
-This plugin provides multiple helper functions and Node scripts. Some are built for Tailwind CSS v3, and others for the future with Tailwind CSS v4.
+This plugin provides multiple helper functions and Node scripts. Some are built for Tailwind CSS v4, and others are kept for backwards compatibility with Tailwind CSS v3.
 
 Below is a list of each of these functions and their use cases.
+
+## Node Commands for Creating CSS for TailwindCSS
+
+This solution makes our code more future-proof since we don't rely on any Tailwind CSS or PostCSS logic.
+Making it independent of the bundler or a compiler allows us and you to use it with any stack.
+
+This has been built for Tailwind v4 support,
+since Tailwind v4 no longer has a JavaScript configuration and only CSS can be used.
+
+### `hyva-init`
+
+This command creates a `hyva.config.json` in the theme folder next to `package.json`.
+This file is used to configure the other `hyva-*` commands.
+
+To run it, use: `npx hyva-init`.
+
+### `hyva-tokens`
+
+This command creates a `generated/hyva-tokens.css` from a design token input.
+
+To run it, use: `npx hyva-tokens`.
+
+By default, this will look for a `design.tokens.json`,
+but if you use **Figma**, you can configure it in `hyva.config.json` to use this file instead:
+
+```json
+{
+    "tokens": {
+        "src": "acme.figma-tokens.json",
+        "format": "figma"
+    }
+}
+```
+
+Since the format of Figma is diffrent, you need to also pass the `format` key with the value `figma`.
+
+If you only need a few simple tokens, you can also create the tokens directly in `hyva.config.json`:
+
+```json
+{
+    "tokens": {
+        "values": {
+            "colors": {
+                "primary": {
+                    "lighter": "oklch(62.3% 0.214 259.815)",
+                    "DEFAULT": "oklch(54.6% 0.245 262.881)",
+                    "darker": "oklch(37.9% 0.146 265.522)"
+                }
+            }
+        }
+    }
+}
+```
+
+By default, `generated/hyva-tokens.css` will be created using `@theme` as the CSS selector, which is the Tailwind v4 syntax.
+You can change the `cssSelector` to anything you want via `tokens.cssSelector`.
+For example, use `:root` for Tailwind v3 compatibility:
+
+```json
+{
+    "tokens": {
+        "cssSelector": ":root"
+    }
+}
+```
+
+You can also customize the dark mode wrapper used for dark tokens with `tokens.mediaDark`.
+It accepts either a CSS `@media` rule or a CSS selector, and defaults to `@media (prefers-color-scheme: dark)`.
+For example, to use a class-based dark mode strategy:
+
+```json
+{
+    "tokens": {
+        "mediaDark": ".dark"
+    }
+}
+```
+
+After this, you can import this file into your Tailwind CSS like any other CSS file.
+
+### `hyva-sources`
+
+This is the replacement for `mergeTailwindConfig` and `postcssImportHyvaModules` in Tailwind v4 projects.
+This command will create a `generated/hyva-source.css` in your project based on the Hyvä-compatible modules.
+
+To run it, use: `npx hyva-sources`.
+
+This uses the same `app/etc/hyva-themes.json` file as `mergeTailwindConfig` and `postcssImportHyvaModules`
+and creates a CSS file using the Tailwind v4 syntax for importing and sourcing the module files.
+
+Since this is now handled by this command, we have moved the exclusion of modules to `hyva.config.json`.
+
+Just as with `postcssImportHyvaModules`, you provide a list of modules you want to exclude.
+
+Since we have a bit more freedom, this command is not just for Hyvä-compatible modules.
+You can even include extra paths. For example,
+you don't need to include the parent theme manually; you can let this command handle that for you.
+
+Here is an example config where you can see the exclude and include options in action:
+
+```json
+{
+    "tailwind": {
+        "include": [
+            { "src": "app/code/Acme/hyva-module" },
+            { "src": "vendor/hyva-themes/magento2-default-theme" }
+        ],
+        "exclude": [
+            { "src": "vendor/hyva-themes/magento2-hyva-checkout/src" }
+        ]
+    }
+}
+```
+
+By default, module CSS files are resolved from the `view/frontend` area. You can change this with `tailwind.area` — for example, to target an admin theme:
+
+```json
+{
+    "tailwind": {
+        "area": "adminhtml"
+    }
+}
+```
+
+By default, external modules from `hyva-themes.json` are automatically included. You can disable this with `tailwind.includeExternalModules: false` to use only the modules listed under `tailwind.include`:
+
+```json
+{
+    "tailwind": {
+        "includeExternalModules": false,
+        "include": [
+            { "src": "app/code/Acme/HyvaModule" }
+        ]
+    }
+}
+```
+
+## CSS Defaults
+
+This package provides several optional CSS modules that offer default styling for common HTML elements.
+They are optimized for TailwindCSS v4 and Hyvä Themes and serve as lightweight alternatives to official TailwindCSS plugins.
+
+To use a module, add the corresponding `@import` rule to your stylesheet.
+
+```css
+/* Import all modules at once */
+@import "@hyva-themes/hyva-modules/css";
+```
+
+Alternatively, you can import modules individually as needed.
+
+### Prose
+
+A lightweight, unopinionated alternative to the `@tailwindcss/typography` plugin.
+It provides sensible typographic defaults for long-form content (like CMS blocks) without imposing specific colors or a `max-width`.
+
+```css
+@import "@hyva-themes/hyva-modules/css/prose.css";
+```
+
+### Forms
+
+A minimal alternative to the `@tailwindcss/forms` plugin, providing clean, basic styles for form elements.
+
+```css
+@import "@hyva-themes/hyva-modules/css/forms.css";
+```
+
+### Fallback
+
+This module restores utility classes from older TailwindCSS versions (v2/v3) that have been removed in v4.
+It ensures backward compatibility with older Hyvä compatibility modules and helps prevent compilation errors during upgrades.
+
+```css
+@import "@hyva-themes/hyva-modules/css/fallback.css";
+```
+
+## Tailwind v3
+
+The following utilities are for **Tailwind v2** and **v3** projects. If you are on Tailwind v4, use `hyva-sources` and `hyva-tokens` instead.
 
 ### `mergeTailwindConfig`
 
@@ -202,150 +382,6 @@ module.exports = mergeTailwindConfig({
 
 For more information on `twVar` and `twProps`,
 please read our documentation at [docs.hyva.io](https://docs.hyva.io/hyva-themes/working-with-tailwindcss/css-variables-plus-tailwindcss.html#method-2-using-the-new-twprops-and-twvar-functions).
-
-## Node Commands for Creating CSS for TailwindCSS
-
-This solution makes our code more future-proof since we don't rely on any Tailwind CSS or PostCSS logic.
-Making it independent of the bundler or a compiler allows us and you to use it with any stack.
-
-This has been built for Tailwind v4 support,
-since Tailwind v4 no longer has a JavaScript configuration and only CSS can be used.
-
-### `hyva-init`
-
-This command creates a `hyva.config.json` in the theme folder next to `package.json`.
-This file is used to configure the other `hyva-*` commands.
-
-To run it, use: `npx hyva-init`.
-
-### `hyva-tokens`
-
-This command creates a `generated/hyva-tokens.css` from a design token input.
-
-To run it, use: `npx hyva-tokens`.
-
-By default, this will look for a `design.tokens.json`,
-but if you use **Figma**, you can configure it in `hyva.config.json` to use this file instead:
-
-```json
-{
-    "tokens": {
-        "src": "acme.figma-tokens.json",
-        "format": "figma"
-    }
-}
-```
-
-Since the format of Figma is diffrent, you need to also pass the `format` key with the value `figma`.
-
-If you only need a few simple tokens, you can also create the tokens directly in `hyva.config.json`:
-
-```json
-{
-    "tokens": {
-        "values": {
-            "colors": {
-                "primary": {
-                    "lighter": "oklch(62.3% 0.214 259.815)",
-                    "DEFAULT": "oklch(54.6% 0.245 262.881)",
-                    "darker": "oklch(37.9% 0.146 265.522)"
-                }
-            }
-        }
-    }
-}
-```
-
-By default, `generated/hyva-tokens.css` will be created in the Tailwind v4 syntax.
-You can change the `cssSelector` to anything you want.
-For example, you could use `:root` to add support for Tailwind v3:
-
-```json
-{
-    "tokens": {
-        "values": {
-            "src": "...",
-            "cssSelector": ":root"
-        }
-    }
-}
-```
-
-After this, you can import this file into your Tailwind CSS like any other CSS file.
-
-### `hyva-sources`
-
-This is the replacement for `mergeTailwindConfig` and `postcssImportHyvaModules` in Tailwind v4 projects.
-This command will create a `generated/hyva-source.css` in your project based on the Hyvä-compatible modules.
-
-To run it, use: `npx hyva-sources`.
-
-This uses the same `app/etc/hyva-themes.json` file as `mergeTailwindConfig` and `postcssImportHyvaModules`
-and creates a CSS file using the Tailwind v4 syntax for importing and sourcing the module files.
-
-Since this is now handled by this command, we have moved the exclusion of modules to `hyva.config.json`.
-
-Just as with `postcssImportHyvaModules`, you provide a list of modules you want to exclude.
-
-Since we have a bit more freedom, this command is not just for Hyvä-compatible modules.
-You can even include extra paths. For example,
-you don't need to include the parent theme manually; you can let this command handle that for you.
-
-Here is an example config where you can see the exclude and include options in action:
-
-```json
-{
-    "tailwind": {
-        "include": [
-            { "src": "app/code/Acme/hyva-module" },
-            { "src": "vendor/hyva-themes/magento2-default-theme" }
-        ],
-        "exclude": [
-            { "src": "vendor/hyva-themes/magento2-hyva-checkout/src" }
-        ]
-    }
-}
-```
-
-## CSS Defaults
-
-This package provides several optional CSS modules that offer default styling for common HTML elements.
-They are optimized for TailwindCSS v4 and Hyvä Themes and serve as lightweight alternatives to official TailwindCSS plugins.
-
-To use a module, add the corresponding `@import` rule to your stylesheet.
-
-```css
-/* Import all modules at once */
-@import "@hyva-themes/hyva-modules/css";
-```
-
-Alternatively, you can import modules individually as needed.
-
-### Prose
-
-A lightweight, unopinionated alternative to the `@tailwindcss/typography` plugin.
-It provides sensible typographic defaults for long-form content (like CMS blocks) without imposing specific colors or a `max-width`.
-
-```css
-@import "@hyva-themes/hyva-modules/css/prose.css";
-```
-
-### Forms
-
-A minimal alternative to the `@tailwindcss/forms` plugin, providing clean, basic styles for form elements.
-
-```css
-@import "@hyva-themes/hyva-modules/css/forms.css";
-```
-
-### Fallback
-
-This module restores utility classes from older TailwindCSS versions (v2/v3) that have been removed in v4.
-It ensures backward compatibility with older Hyvä compatibility modules and helps prevent compilation errors during upgrades.
-
-```css
-@import "@hyva-themes/hyva-modules/css/fallback.css";
-```
 
 ### License
 
