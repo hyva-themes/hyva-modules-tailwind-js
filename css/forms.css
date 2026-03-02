@@ -8,7 +8,7 @@
  * https://github.com/tailwindlabs/tailwindcss/blob/main/packages/tailwindcss/preflight.css
  */
 
-@import "./utilities/form.css";
+@import "./form-input.css";
 
 @theme {
     --form-py: --spacing(2);

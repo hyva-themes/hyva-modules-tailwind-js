@@ -1,3 +1,11 @@
+/**
+ * Form input utilities for forms.css
+ *
+ * Reusable base utilities applied to form elements via @apply in forms.css.
+ * These expose the form theme tokens (--form-py, --form-px, etc.) as composable utilities,
+ * allowing direct use on custom form elements outside the default selector scope.
+ */
+
 @utility form-input-field {
     appearance: none;
     padding-block: var(--form-py);
