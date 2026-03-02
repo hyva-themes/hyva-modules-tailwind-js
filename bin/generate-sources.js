@@ -97,8 +97,7 @@ const { importStatements, sourceStatements, moduleStatements } =
             if (existsSync(tailwindCSSPath)) {
                 acc.moduleStatements += importPath("module.css");
             } else {
-                acc.sourceStatements += `@source "${themeCSSPath}/**/*.phtml";\n`;
-                acc.sourceStatements += `@source "${themeCSSPath}/**/*.xml";\n`;
+                acc.sourceStatements += `@source "${themeCSSPath}";\n`;
                 if (existsSync(tailwindSourceCSSPath)) {
                     acc.importStatements += importPath("tailwind-source.css");
                 }
