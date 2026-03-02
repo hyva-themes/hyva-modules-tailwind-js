@@ -6,8 +6,8 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import { cwd } from "node:process";
-import { consoleWarn } from "./console.js";
+import { cwd, exit } from "node:process";
+import { consoleError, consoleWarn } from "./console.js";
 
 /**
  * Finds the base directory of the project by checking for the presence of
@@ -63,14 +63,21 @@ export function getJsonFile(
     file,
     { filePath = cwd(), errorMessage = "" } = {}
 ) {
+    let fileContent;
     try {
         if (!filePath) return {};
-        const fileContent = fs.readFileSync(path.join(filePath, file), "utf8");
-        return JSON.parse(fileContent);
+        fileContent = fs.readFileSync(path.join(filePath, file), "utf8");
     } catch (error) {
         if (errorMessage) {
             consoleWarn(errorMessage);
         }
         return {};
+    }
+
+    try {
+        return JSON.parse(fileContent);
+    } catch (error) {
+        consoleError(`Invalid JSON in "${file}":\n${error.message}`);
+        exit(1);
     }
 }
