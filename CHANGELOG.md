@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added `area` option to `hyva.config.json` tailwind config, allowing customization of the Magento view area used when resolving module CSS paths (defaults to `frontend`, e.g. set to `adminhtml` for admin themes).
 - Introduced customizable Prose Modifiers, offering a lightweight alternative to the default Tailwind `prose` utilities with distinct internal implementations.
 - Added `mediaDark` option to `hyva.config.json` tokens config, allowing customization of the dark mode media query used when generating `hyva-tokens.css`.
 - Added GitHub Actions CI workflow to run tests on push and pull requests to `main`.

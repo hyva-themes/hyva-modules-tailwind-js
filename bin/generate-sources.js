@@ -32,6 +32,7 @@ const includeConfig = getJsonFile(`app/etc/${hyvaThemesJsonInclude}`, {
     errorMessage: `No ${hyvaThemesJsonInclude} found, make sure to create one with 'bin/magento hyva:config:generate'`,
 });
 const hyvaConfig = getJsonFile(hyvaThemesJsonConfig);
+const hyvaArea = hyvaConfig.tailwind?.area ?? "frontend";
 const filteredModules =
     includeConfig.extensions?.filter((module) => {
         const isExcluded = hyvaConfig.tailwind?.exclude?.some(
@@ -84,15 +85,15 @@ const { importStatements, sourceStatements, moduleStatements } =
 
             const tailwindCSSPath = path.join(
                 themePath,
-                "view/frontend/tailwind/module.css"
+                `view/${hyvaArea}/tailwind/module.css`
             );
             const tailwindSourceCSSPath = path.join(
                 themePath,
-                "view/frontend/tailwind/tailwind-source.css"
+                `view/${hyvaArea}/tailwind/tailwind-source.css`
             );
 
             const importPath = (cssPath) =>
-                `@import "${themeCSSPath}/view/frontend/tailwind/${cssPath}";\n`;
+                `@import "${themeCSSPath}/view/${hyvaArea}/tailwind/${cssPath}";\n`;
 
             if (existsSync(tailwindCSSPath)) {
                 acc.moduleStatements += importPath("module.css");
