@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `mediaDark` option to `hyva.config.json` tokens config,
   allowing customization of the dark mode media query used when generating `hyva-tokens.css`.
 - Added GitHub Actions CI workflow to run tests on push and pull requests to `main`.
+- Added SECURITY.md for vulnerability reporting.
 
 ### Changed
 
