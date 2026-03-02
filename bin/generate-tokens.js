@@ -9,8 +9,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { cwd, exit } from "node:process";
 import { consoleError, consoleWarn, getJsonFile } from "../src/utils/index.js";
-import fromTokens from "../src/from-tokens.js";
-import toStyleTokens from "../src/to-style.js";
+import fromTokens from "@fylgja/props-builder/src/from-tokens.js";
+import toStyleTokens from "@fylgja/props-builder/src/to-style.js";
 
 const currentFolderName = path.basename(cwd());
 if (currentFolderName !== "tailwind") {
