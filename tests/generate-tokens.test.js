@@ -44,6 +44,10 @@ before(async () => {
                     base: "1rem",
                     lg: "1.125rem",
                 },
+                fontFamilies: {
+                    standard: { $value: "Arial, sans-serif" },
+                    heading: { $value: "{fontFamilies.standard}" },
+                },
             },
         },
     }, null, 4));
@@ -79,4 +83,12 @@ test("generates font-size tokens", async () => {
     assert.ok(css.includes("--font-size-sm: 0.875rem"), "should contain --font-size-sm");
     assert.ok(css.includes("--font-size-base: 1rem"), "should contain --font-size-base");
     assert.ok(css.includes("--font-size-lg: 1.125rem"), "should contain --font-size-lg");
+});
+
+test("converts token references to CSS variables", async () => {
+    const css = await readFile(generatedFile, "utf8");
+    assert.ok(
+        css.includes("var(--fontFamilies-standard)"),
+        "should convert {fontFamilies.standard} to var(--fontFamilies-standard)"
+    );
 });
