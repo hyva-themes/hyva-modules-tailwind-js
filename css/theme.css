@@ -1,0 +1,34 @@
+/* Default theme variables for Hyva Themes */
+
+@theme {
+    --color-background: var(--color-gray-50);
+    --color-surface: var(--color-white);
+    --color-ink: var(--color-gray-950);
+    --color-ink-muted: var(--color-gray-600);
+
+    --color-primary: oklch(46% 0.2 265);
+    --color-primary-lighter: color-mix(
+        in oklch,
+        var(--color-primary) 80%,
+        var(--color-white)
+    );
+    --color-primary-darker: color-mix(
+        in oklch,
+        var(--color-primary) 80%,
+        var(--color-black)
+    );
+    --color-on-primary: var(--color-white);
+
+    --color-secondary: oklch(53% 0.15 150);
+    --color-secondary-lighter: color-mix(
+        in oklch,
+        var(--color-secondary) 80%,
+        var(--color-white)
+    );
+    --color-secondary-darker: color-mix(
+        in oklch,
+        var(--color-secondary) 80%,
+        var(--color-black)
+    );
+    --color-on-secondary: var(--color-white);
+}

@@ -1,3 +1,6 @@
-@import "./fallback.css";
+@import "./theme.css";
+
 @import "./prose.css";
 @import "./forms.css";
+
+@import "./fallback.css";

@@ -55,3 +55,16 @@
 @utility decoration-clone {
     box-decoration-break: slice;
 }
+
+/**
+ * Renamed color tokens: `fg`/`fg-secondary` -> `ink`/`ink-muted`.
+ * Keeps existing .phtml templates working while they're migrated to the new naming.
+ */
+
+@utility text-fg {
+    color: var(--color-ink);
+}
+
+@utility text-fg-secondary {
+    color: var(--color-ink-muted);
+}
