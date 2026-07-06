@@ -5,7 +5,7 @@
  */
 
 import { consoleError, consoleSuccess, consoleWarn } from "./console.js";
-import { getBasePath, basePath, getRelativePath, getJsonFile, warnOnGitignoreWildcard } from "./file.js";
+import { getBasePath, basePath, getRelativePath, getJsonFile, getTextFile, warnOnGitignoreWildcard } from "./file.js";
 export {
     consoleError,
     consoleSuccess,
@@ -14,6 +14,7 @@ export {
     basePath,
     getRelativePath,
     getJsonFile,
+    getTextFile,
     warnOnGitignoreWildcard,
 };
 
