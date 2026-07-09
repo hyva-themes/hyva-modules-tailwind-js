@@ -11,8 +11,8 @@ colors:
     DEFAULT: '#006e2e'
     darker: '#004d20'
   on-secondary: '#ffffff'
+  bg: '#f8fafc'
   surface: '#ffffff'
-  surface-dim: '#f8fafc'
   ink: '#020617'
   ink-muted: '#475569'
 form:
@@ -21,7 +21,7 @@ form:
   stroke: '#747685'
   radius: 0.5rem
   active-color: '#0030a1'
-fontFamily:
+font:
   sans: Inter
 ---
 

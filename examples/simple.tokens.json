@@ -1,0 +1,30 @@
+{
+  "colors": {
+    "primary": {
+      "lighter": "#4d6ebd",
+      "DEFAULT": "#0030a1",
+      "darker": "#002271"
+    },
+    "on-primary": "#fff",
+    "secondary": {
+      "lighter": "#4d9a6d",
+      "DEFAULT": "#006e2e",
+      "darker": "#004d20"
+    },
+    "on-secondary": "#fff",
+    "bg": "#f8fafc",
+    "surface": "#fff",
+    "ink": "#020617",
+    "ink-muted": "#475569"
+  },
+  "form": {
+    "bg": "#fff",
+    "color": "#1a1b23",
+    "stroke": "#747685",
+    "radius": "0.5rem",
+    "active-color": "#0030a1"
+  },
+  "font": {
+    "sans": "Inter"
+  }
+}
