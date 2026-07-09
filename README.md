@@ -60,6 +60,21 @@ but if you use **Figma**, you can configure it in `hyva.config.json` to use this
 
 Since the format of Figma is diffrent, you need to also pass the `format` key with the value `figma`.
 
+If you use **Google Stitch**, point `tokens.src` at the exported Markdown file:
+
+```json
+{
+    "tokens": {
+        "src": "DESIGN.md"
+    }
+}
+```
+
+The `format` key can be omitted here, since a `.md` source is automatically treated as a Stitch export.
+Only the YAML frontmatter block is used; the rest of the Markdown document (brand voice, component notes, ...) is ignored.
+Every key in the frontmatter is turned into tokens, except for known metadata keys (`name`, `description`), which are dropped.
+Stitch exports the color group as `colors`, but it's automatically renamed to the singular `color` to match Hyvä's naming convention (`--color-primary` instead of `--colors-primary`) — no manual `rename` config needed.
+
 If you only need a few simple tokens, you can also create the tokens directly in `hyva.config.json`:
 
 ```json
@@ -89,6 +104,39 @@ For example, use `:root` for Tailwind v3 compatibility:
     }
 }
 ```
+
+If your tokens source wraps the actual values in structural keys (for example a `tokens.values` wrapper coming from an external generator),
+you can drop them with `tokens.stripPrefix`, and rename groups to match Hyvä's naming with `tokens.rename`:
+
+```json
+{
+    "tokens": {
+        "src": "acme.tokens.json",
+        "stripPrefix": "tokens.values",
+        "rename": {
+            "colors": "color"
+        }
+    }
+}
+```
+
+Given a `acme.tokens.json` like:
+
+```json
+{
+    "$description": "Generated tokens, dropped automatically",
+    "tokens": {
+        "values": {
+            "colors": {
+                "primary": "#1d4ed8"
+            }
+        }
+    }
+}
+```
+
+This will generate `--color-primary: #1d4ed8;` instead of `--tokens-values-colors-primary: #1d4ed8;`.
+Metadata keys such as `$description` are always dropped, since they are not valid CSS custom property names.
 
 You can also customize the dark mode wrapper used for dark tokens with `tokens.mediaDark`.
 It accepts either a CSS `@media` rule or a CSS selector, and defaults to `@media (prefers-color-scheme: dark)`.
@@ -186,6 +234,16 @@ To use a module, add the corresponding `@import` rule to your stylesheet.
 ```
 
 Alternatively, you can import modules individually as needed.
+
+### Theme
+
+Provides default color tokens (`primary`, `secondary`, `background`, `surface`, `ink`, `ink-muted`) so a theme has a working palette before its own design tokens are generated via `hyva-tokens`.
+
+Colors are defined in `oklch`, with `primary-lighter`/`primary-darker` (and the `secondary` equivalents) derived via `color-mix()` from the base color, so overriding `--color-primary`/`--color-secondary` keeps the tints in sync automatically.
+
+```css
+@import "@hyva-themes/hyva-modules/css/theme.css";
+```
 
 ### Prose
 

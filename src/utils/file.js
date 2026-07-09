@@ -121,3 +121,28 @@ export function getJsonFile(
         exit(1);
     }
 }
+
+/**
+ * Reads a file and returns its raw content.
+ * If the file cannot be read, it returns an empty string and optionally logs a warning.
+ *
+ * @param {string} file - file name
+ * @param {Object} [options]
+ * @param {string} [options.filePath=cwd()] - Directory where the file is located
+ * @param {string} [options.errorMessage] - Message to display if the file cannot be read
+ * @returns {string} Raw file content or an empty string if the file cannot be read
+ */
+export function getTextFile(
+    file,
+    { filePath = cwd(), errorMessage = "" } = {}
+) {
+    try {
+        if (!filePath) return "";
+        return fs.readFileSync(path.join(filePath, file), "utf8");
+    } catch (error) {
+        if (errorMessage) {
+            consoleWarn(errorMessage);
+        }
+        return "";
+    }
+}

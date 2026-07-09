@@ -4,7 +4,7 @@
  * See COPYING.txt for license details.
  */
 
-import { test, before, after } from "node:test";
+import { test, describe, before, after } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { readFile, rm, mkdir, writeFile } from "node:fs/promises";
@@ -17,9 +17,9 @@ const generatedDir = resolve(fixtureDir, "generated");
 const generatedFile = resolve(generatedDir, "hyva-tokens.css");
 const binPath = resolve(__dirname, "../bin/generate-tokens.js");
 
-const runGenerateTokens = () =>
+const runGenerateTokensIn = (cwd) =>
     new Promise((resolve, reject) => {
-        const child = spawn(process.execPath, [binPath], { cwd: fixtureDir });
+        const child = spawn(process.execPath, [binPath], { cwd });
         let stderr = "";
         child.stderr.on("data", (data) => (stderr += data));
         child.on("close", (code) => {
@@ -27,6 +27,8 @@ const runGenerateTokens = () =>
             else reject(new Error(`Process exited with code ${code}\n${stderr}`));
         });
     });
+
+const runGenerateTokens = () => runGenerateTokensIn(fixtureDir);
 
 before(async () => {
     await rm(fixtureDir, { recursive: true, force: true });
@@ -91,4 +93,145 @@ test("converts token references to CSS variables", async () => {
         css.includes("var(--fontFamilies-standard)"),
         "should convert {fontFamilies.standard} to var(--fontFamilies-standard)"
     );
+});
+
+describe("tokens with a wrapping prefix and renamed groups", () => {
+    const prefixedFixtureDir = resolve(__dirname, "fixtures/prefixed/tailwind");
+    const prefixedGeneratedFile = resolve(prefixedFixtureDir, "generated/hyva-tokens.css");
+    const prefixedFixtureRoot = resolve(__dirname, "fixtures/prefixed");
+
+    before(async () => {
+        await rm(prefixedFixtureRoot, { recursive: true, force: true });
+        await mkdir(prefixedFixtureDir, { recursive: true });
+        await writeFile(resolve(prefixedFixtureDir, "hyva.config.json"), JSON.stringify({
+            tokens: {
+                cssSelector: "@theme",
+                src: "design.tokens.json",
+                stripPrefix: "tokens.values",
+                rename: { colors: "color" },
+            },
+        }, null, 4));
+        await writeFile(resolve(prefixedFixtureDir, "design.tokens.json"), JSON.stringify({
+            $description: "Should not become a CSS custom property",
+            tokens: {
+                values: {
+                    colors: {
+                        primary: "#1d4ed8",
+                    },
+                },
+            },
+        }, null, 4));
+        await runGenerateTokensIn(prefixedFixtureDir);
+    });
+
+    after(async () => {
+        await rm(prefixedFixtureRoot, { recursive: true, force: true });
+    });
+
+    test("drops metadata keys instead of emitting an invalid custom property", async () => {
+        const css = await readFile(prefixedGeneratedFile, "utf8");
+        assert.ok(!css.includes("$description"), "should not include $description");
+    });
+
+    test("strips the configured wrapper prefix", async () => {
+        const css = await readFile(prefixedGeneratedFile, "utf8");
+        assert.ok(!css.includes("tokens-values"), "should not include the tokens-values prefix");
+    });
+
+    test("renames groups based on the configured rename map", async () => {
+        const css = await readFile(prefixedGeneratedFile, "utf8");
+        assert.ok(css.includes("--color-primary: #1d4ed8"), "should contain --color-primary");
+    });
+});
+
+describe("tokens from a Google Stitch Markdown export", () => {
+    const stitchFixtureDir = resolve(__dirname, "fixtures/stitch/tailwind");
+    const stitchGeneratedFile = resolve(stitchFixtureDir, "generated/hyva-tokens.css");
+    const stitchFixtureRoot = resolve(__dirname, "fixtures/stitch");
+
+    before(async () => {
+        await rm(stitchFixtureRoot, { recursive: true, force: true });
+        await mkdir(stitchFixtureDir, { recursive: true });
+        await writeFile(resolve(stitchFixtureDir, "hyva.config.json"), JSON.stringify({
+            tokens: {
+                cssSelector: "@theme",
+                src: "DESIGN.md",
+            },
+        }, null, 4));
+        await writeFile(
+            resolve(stitchFixtureDir, "DESIGN.md"),
+            [
+                "---",
+                "name: Technical Precision",
+                "description: A design system export",
+                "colors:",
+                "  primary: '#a7000c'",
+                "  on-primary: '#ffffff'",
+                "typography:",
+                "  headline-lg:",
+                "    fontFamily: Titillium Web",
+                "    fontSize: 24px",
+                "    fontWeight: '700'",
+                "  label-sm:",
+                "    fontFamily: Open Sans",
+                "    fontSize: 10px",
+                "    letterSpacing: 0.02em",
+                "spacing:",
+                "  technical-indent: 60px",
+                "form:",
+                "  bg: '#ffffff'",
+                "  radius: var(--radius-lg)",
+                "---",
+                "",
+                "## Brand & Style",
+                "",
+                "This prose section, including any `colors` or `spacing` mentions, should be ignored.",
+                "",
+            ].join("\n")
+        );
+        await runGenerateTokensIn(stitchFixtureDir);
+    });
+
+    after(async () => {
+        await rm(stitchFixtureRoot, { recursive: true, force: true });
+    });
+
+    test("renames the colors group to color without a manual config", async () => {
+        const css = await readFile(stitchGeneratedFile, "utf8");
+        assert.ok(css.includes("--color-primary: #a7000c"), "should contain --color-primary");
+        assert.ok(css.includes("--color-on-primary: #ffffff"), "should contain --color-on-primary");
+        assert.ok(!css.includes("--colors-"), "should not contain the plural --colors- prefix");
+    });
+
+    test("generates tokens for any frontmatter group, not just a fixed list", async () => {
+        const css = await readFile(stitchGeneratedFile, "utf8");
+        assert.ok(
+            css.includes("--typography-headline-lg-font-family: Titillium Web"),
+            "should contain --typography-headline-lg-font-family"
+        );
+        assert.ok(
+            css.includes("--typography-label-sm-letter-spacing: 0.02em"),
+            "should contain --typography-label-sm-letter-spacing"
+        );
+        assert.ok(
+            css.includes("--spacing-technical-indent: 60px"),
+            "should contain --spacing-technical-indent"
+        );
+        assert.ok(
+            css.includes("--form-radius: var(--radius-lg)"),
+            "should contain --form-radius, an arbitrary group not on any allowlist"
+        );
+    });
+
+    test("drops the known metadata keys (name, description)", async () => {
+        const css = await readFile(stitchGeneratedFile, "utf8");
+        assert.ok(!css.includes("Technical Precision"), "should not include the `name` metadata value");
+        assert.ok(!css.includes("A design system export"), "should not include the `description` metadata value");
+    });
+
+    test("ignores the Markdown prose body", async () => {
+        const css = await readFile(stitchGeneratedFile, "utf8");
+        assert.ok(!css.includes("Brand & Style"), "should not include Markdown prose");
+        assert.ok(!css.includes("ignored"), "should not include Markdown prose");
+    });
 });
