@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-[unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.3.0...HEAD
+## [1.4.0] - 2026-07-09
 
 ### Added
 
@@ -47,8 +47,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     `ink` pairs naturally with `surface` (the ink sits on a surface), rather than standing alone as an unrelated abbreviation.
 
 ## [1.3.0] - 2026-03-02
-
-[1.3.0]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.4...1.3.0
 
 ### Added
 
@@ -95,8 +93,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.4] - 2025-11-20
 
-[1.2.4]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.3...1.2.4
-
 ### Added
 
 - Debug helper for .gitignore issues with Tailwind v4 and sources
@@ -108,15 +104,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.3] - 2025-11-20
 
-[1.2.3]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.2...1.2.3
-
 ### Fixed
 
 - Missing import in the `util/file.js` (thanks to @julien-desiage)
 
 ## [1.2.2] - 2025-10-16
-
-[1.2.2]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.1...1.2.2
 
 ### Changed
 
@@ -128,15 +120,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.1] - 2025-10-15
 
-[1.2.1]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.0...1.2.1
-
 ### Fixed
 
 - Missing folder in package list
 
 ## [1.2.0] - 2025-10-15
-
-[1.2.0]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.1.1...1.2.1
 
 ### Added
 
@@ -146,15 +134,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.1] - 2025-08-29
 
-[1.1.1]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.1.0...1.1.1
-
 ### Fixed
 
 - Token format, to default instead of Figma, this allows the use of simple tokens without using the format option
 
 ## [1.1.0] - 2025-08-29
-
-[1.1.0]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.11...1.1.0
 
 ### Added
 
@@ -169,15 +153,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.11] - 2025-02-18
 
-[1.0.11]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.10...1.0.11
-
 ### Fixed
 
 - Throw an error when building TailwindCSS without a hyva-themes.json file
 
 ## [1.0.10] - 2024-10-18
-
-[1.0.10]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.9...1.0.10
 
 ### Fixed
 
@@ -188,15 +168,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.9] - 2024-10-18
 
-[1.0.9]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.8...1.0.9
-
 ### Added
 
 - New functions `twVar()` and `twProps()`, for using CSS variables in TailwindCSS
 
 ## [1.0.8] - 2023-04-15
-
-[1.0.8]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.7...1.0.8
 
 ### Fixed
 
@@ -204,18 +180,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.7] - 2023-04-15
 
-[1.0.7]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.6...1.0.7
-
 ### Added
 
 - `excludeDirs` argument to `postcssImportHyvaModules()` function (thanks to @grimlink)
 
 ## [1.0.6] - 2023-04-15
 
-[1.0.6]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.1...1.0.6
-
 Fixes and updates
 
 ## 1.0.0 - 2022-04-15
 
 Initial Release 🎉
+
+[unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.4.0...HEAD
+[1.4.0]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.3.0...1.4.0
+[1.3.0]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.4...1.3.0
+[1.2.4]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.3...1.2.4
+[1.2.3]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.2...1.2.3
+[1.2.2]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.1...1.2.2
+[1.2.1]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.0...1.2.1
+[1.2.0]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.1.1...1.2.1
+[1.1.1]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.1.0...1.1.1
+[1.1.0]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.11...1.1.0
+[1.0.11]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.10...1.0.11
+[1.0.10]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.9...1.0.10
+[1.0.9]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.8...1.0.9
+[1.0.8]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.7...1.0.8
+[1.0.7]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.6...1.0.7
+[1.0.6]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.0.1...1.0.6
