@@ -28,11 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     Colors are defined in `oklch`.
     `lighter`/`darker` styles are derived via `color-mix()` from the base color, so overriding `--color-primary`/`--color-secondary` keeps the tints in sync automatically.
 
--   Added `text-fg` and `text-fg-secondary` fallback utilities to `fallback.css`,
-    mapping to the renamed `ink`/`ink-muted` color tokens.
-
-    This keeps existing `.phtml` templates working while they're migrated to the new class names.
-
 - Added `DESIGN.md`, an example design-token file demonstrating the Hyvä/Tailwind naming convention for a project's own design tokens.
 
 ### Changed
