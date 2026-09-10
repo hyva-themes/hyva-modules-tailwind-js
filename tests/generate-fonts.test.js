@@ -6,6 +6,7 @@
 
 import { test, describe, beforeEach, after } from "node:test";
 import { spawn } from "node:child_process";
+import { brotliCompressSync } from "node:zlib";
 import assert from "node:assert/strict";
 import { readFile, readdir, rm, mkdir, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
@@ -16,6 +17,9 @@ import { mergeVariableFaces } from "../src/fonts/api/faces.js";
 import { parseFontFaces } from "../src/fonts/api/stylesheet.js";
 import { providers } from "../src/fonts/providers/index.js";
 import { generateFonts } from "../src/fonts/index.js";
+import { readMetrics } from "../src/fonts/metrics.js";
+import { buildFallbackFace, pickFallback } from "../src/fonts/fallback.js";
+import { renderFallbackFace } from "../src/fonts/css.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const themeDir = resolve(__dirname, "fixtures/fonts-theme");
@@ -1203,5 +1207,246 @@ describe("command output", () => {
 
         assert.equal(result.code, 1);
         assert.match(result.output, /only supports "normal" and "italic"/);
+    });
+});
+
+describe("fallback metrics", () => {
+    const UNITS_PER_EM = 1000;
+    const ADVANCE = 1000;
+    const GLYPHS = 92;
+
+    /** A cmap mapping every character from space to "z" onto its own glyph. */
+    const cmapTable = () => {
+        const segCount = 2;
+        const table = Buffer.alloc(16 + segCount * 8);
+        table.writeUInt16BE(4, 0);
+        table.writeUInt16BE(table.length, 2);
+        table.writeUInt16BE(segCount * 2, 6);
+        table.writeUInt16BE(0x7a, 14);
+        table.writeUInt16BE(0xffff, 16);
+        table.writeUInt16BE(0x20, 20);
+        table.writeUInt16BE(0xffff, 22);
+        table.writeInt16BE(1 - 0x20, 24);
+        table.writeInt16BE(1, 26);
+
+        const cmap = Buffer.alloc(12 + table.length);
+        cmap.writeUInt16BE(1, 2);
+        cmap.writeUInt16BE(3, 4);
+        cmap.writeUInt16BE(1, 6);
+        cmap.writeUInt32BE(12, 8);
+        table.copy(cmap, 12);
+        return cmap;
+    };
+
+    /** The tables of a font whose every glyph is exactly ADVANCE wide. */
+    const fontTables = () => {
+        const head = Buffer.alloc(54);
+        head.writeUInt16BE(UNITS_PER_EM, 18);
+
+        const hhea = Buffer.alloc(36);
+        hhea.writeInt16BE(800, 4);
+        hhea.writeInt16BE(-200, 6);
+        hhea.writeInt16BE(0, 8);
+        hhea.writeUInt16BE(GLYPHS, 34);
+
+        const hmtx = Buffer.alloc(GLYPHS * 4);
+        for (let i = 0; i < GLYPHS; i++) hmtx.writeUInt16BE(ADVANCE, i * 4);
+
+        return [
+            ["cmap", cmapTable()],
+            ["head", head],
+            ["hhea", hhea],
+            ["hmtx", hmtx],
+            ["OS/2", Buffer.alloc(96)],
+        ];
+    };
+
+    /** Pack the tables as a plain TrueType font. */
+    const buildSfnt = () => {
+        const tables = fontTables();
+        const header = Buffer.alloc(12 + tables.length * 16);
+        header.writeUInt32BE(0x00010000, 0);
+        header.writeUInt16BE(tables.length, 4);
+
+        let offset = header.length;
+        const body = [];
+        tables.forEach(([tag, data], i) => {
+            const entry = 12 + i * 16;
+            header.write(tag.padEnd(4), entry, "latin1");
+            header.writeUInt32BE(offset, entry + 8);
+            header.writeUInt32BE(data.length, entry + 12);
+            offset += data.length;
+            body.push(data);
+        });
+
+        return Buffer.concat([header, ...body]);
+    };
+
+    /** Pack the same tables as a woff2, which is what a provider serves. */
+    const buildWoff2 = () => {
+        const tables = fontTables();
+        const indexes = { cmap: 0, head: 1, hhea: 2, hmtx: 3, "OS/2": 6 };
+
+        const base128 = (value) => {
+            const bytes = [];
+            do {
+                bytes.unshift(value & 0x7f);
+                value >>>= 7;
+            } while (value);
+            for (let i = 0; i < bytes.length - 1; i++) bytes[i] |= 0x80;
+            return Buffer.from(bytes);
+        };
+
+        const directory = Buffer.concat(
+            tables.map(([tag, data]) =>
+                Buffer.concat([Buffer.from([indexes[tag]]), base128(data.length)])
+            )
+        );
+        const compressed = brotliCompressSync(
+            Buffer.concat(tables.map(([, data]) => data))
+        );
+
+        const header = Buffer.alloc(48);
+        header.write("wOF2", 0, "latin1");
+        header.writeUInt16BE(tables.length, 12);
+        header.writeUInt32BE(compressed.length, 20);
+
+        return Buffer.concat([header, directory, compressed]);
+    };
+
+    test("reads the metrics of a plain TrueType font", async () => {
+        const file = resolve(fontsDir, "synthetic.ttf");
+        await writeFile(file, buildSfnt());
+
+        assert.deepEqual(readMetrics(file), {
+            unitsPerEm: 1000,
+            ascent: 800,
+            descent: -200,
+            lineGap: 0,
+            xWidthAvg: 1000,
+        });
+    });
+
+    test("reads the metrics of a woff2, which is compressed", async () => {
+        const file = resolve(fontsDir, "synthetic.woff2");
+        await writeFile(file, buildWoff2());
+
+        assert.deepEqual(readMetrics(file), {
+            unitsPerEm: 1000,
+            ascent: 800,
+            descent: -200,
+            lineGap: 0,
+            xWidthAvg: 1000,
+        });
+    });
+
+    test("returns nothing for a file that is not a font", async () => {
+        const file = resolve(fontsDir, "not-a-font.woff2");
+        await writeFile(file, "this is not a font");
+
+        assert.equal(readMetrics(file), null);
+    });
+
+    test("prefers a named fallback over a generic one", () => {
+        assert.deepEqual(pickFallback(["Georgia", "sans-serif"]).local, ["Georgia", "Gelasio"]);
+        assert.deepEqual(pickFallback(['"Trebuchet MS"']).local, ["Trebuchet MS"]);
+    });
+
+    test("stands a representative in for a generic fallback", () => {
+        assert.equal(pickFallback(["sans-serif"]).local[0], "Arial");
+        assert.equal(pickFallback(["serif"]).local[0], "Times New Roman");
+        assert.equal(pickFallback(["ui-monospace", "monospace"]).local[0], "Courier New");
+    });
+
+    test("has nothing to match a fallback it does not know", () => {
+        assert.equal(pickFallback(["cursive"]), null);
+        assert.equal(pickFallback([]), null);
+    });
+
+    test("scales the overrides by how much wider the webfont is", async () => {
+        const file = resolve(fontsDir, "synthetic.ttf");
+        await writeFile(file, buildSfnt());
+
+        const face = buildFallbackFace(
+            { name: "Acme Sans", fallbacks: ["sans-serif"] },
+            file
+        );
+
+        // Arial averages 904 per 2048 units, the synthetic font 1000 per 1000,
+        // so it is 2.2655 times as wide and every override is divided by that.
+        assert.equal(face.family, "Acme Sans fallback");
+        assert.equal(face.sizeAdjust, "226.55%");
+        assert.equal(face.ascentOverride, "35.31%");
+        assert.equal(face.descentOverride, "8.83%");
+        assert.equal(face.lineGapOverride, "0%");
+    });
+
+    test("renders the adjusted face", () => {
+        const css = renderFallbackFace({
+            family: "Acme Sans fallback",
+            local: ["Arial", "Arimo"],
+            sizeAdjust: "107.3%",
+            ascentOverride: "90.28%",
+            descentOverride: "22.48%",
+            lineGapOverride: "0%",
+        });
+
+        assert.ok(css.includes('font-family: "Acme Sans fallback";'));
+        assert.ok(css.includes('src: local("Arial"), local("Arimo");'));
+        assert.ok(css.includes("size-adjust: 107.3%;"));
+        assert.ok(css.includes("ascent-override: 90.28%;"));
+    });
+
+    test("puts the adjusted face into the stack, before the fallbacks", async () => {
+        await writeFile(resolve(fontsDir, "acme.woff2"), buildWoff2());
+        await run({
+            fonts: [
+                {
+                    provider: "local",
+                    name: "Acme",
+                    fallbacks: ["Arial", "sans-serif"],
+                    variants: [{ src: "acme.woff2" }],
+                },
+            ],
+        });
+
+        const css = await readFile(cssFile, "utf8");
+        assert.ok(css.includes('font-family: "Acme fallback";'), css);
+        assert.ok(css.includes('--font-acme: Acme, "Acme fallback", Arial, sans-serif;'), css);
+    });
+
+    test("leaves the stack alone when adjustFallback is off", async () => {
+        await writeFile(resolve(fontsDir, "acme.woff2"), buildWoff2());
+        await run({
+            fonts: [
+                {
+                    provider: "local",
+                    name: "Acme",
+                    adjustFallback: false,
+                    variants: [{ src: "acme.woff2" }],
+                },
+            ],
+        });
+
+        const css = await readFile(cssFile, "utf8");
+        assert.ok(!css.includes("fallback"), css);
+        assert.ok(css.includes("--font-acme: Acme, sans-serif;"));
+    });
+
+    test("skips the adjusted face when the font cannot be measured", async () => {
+        await writeFile(resolve(fontsDir, "acme.woff2"), "not a font");
+        const result = await run({
+            fonts: [
+                {
+                    provider: "local",
+                    name: "Acme",
+                    variants: [{ src: "acme.woff2" }],
+                },
+            ],
+        });
+
+        assert.deepEqual(result.warnings, [], "an unmeasurable font is not a problem");
+        assert.equal(result.families[0].fallbackFace, null);
+        assert.ok((await readFile(cssFile, "utf8")).includes("--font-acme: Acme, sans-serif;"));
     });
 });

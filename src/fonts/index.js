@@ -12,6 +12,7 @@ import { getProvider } from "./providers/index.js";
 import { renderFontsCss } from "./css.js";
 import { PRELOAD_FILE, renderPreloadXml } from "./preload.js";
 import { updateLayout } from "./layout.js";
+import { buildFallbackFace } from "./fallback.js";
 import {
     MANIFEST_FILE,
     cacheKey,
@@ -303,6 +304,15 @@ export async function generateFonts(
 
     const withUrls = families.map((family) => ({
         ...family,
+        // Measured from the file on disk, so it works offline and covers a
+        // local font just as well as one from a catalogue.
+        fallbackFace:
+            family.adjustFallback && family.faces.length
+                ? buildFallbackFace(
+                      family,
+                      path.join(fontsDir, family.faces[0].files[0])
+                  )
+                : null,
         faces: family.faces.map((face) => ({
             ...face,
             // The configured name and font-display always win, so every

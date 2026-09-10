@@ -127,6 +127,7 @@ function normalizeFont(font, index, errors) {
         cssVariable,
         cssSelector: font.cssSelector?.trim() || undefined,
         preload: font.preload === true,
+        adjustFallback: font.adjustFallback !== false,
         slug: slugify(name),
         // Providers that address a family by an id in a URL derive it from the
         // name, which `id` overrides for the rare family whose id differs.

@@ -48,6 +48,26 @@ export function renderFontFace(face) {
 }
 
 /**
+ * Render the face that adjusts a locally installed font to the metrics of the
+ * webfont, so the two occupy the same space.
+ *
+ * @param {Object} face - Face from `buildFallbackFace`.
+ * @returns {string} CSS
+ */
+export function renderFallbackFace(face) {
+    const declarations = [
+        `font-family: ${quoteFamily(face.family)}`,
+        `src: ${face.local.map((name) => `local("${name}")`).join(", ")}`,
+        `size-adjust: ${face.sizeAdjust}`,
+        `ascent-override: ${face.ascentOverride}`,
+        `descent-override: ${face.descentOverride}`,
+        `line-gap-override: ${face.lineGapOverride}`,
+    ];
+
+    return `@font-face {\n${declarations.map((line) => `    ${line};`).join("\n")}\n}`;
+}
+
+/**
  * Group families by the selector their CSS variable belongs in, keeping the
  * order they were configured in.
  *
@@ -79,14 +99,23 @@ function groupBySelector(families, fallbackSelector) {
  */
 export function renderFontsCss(families, { cssSelector = "@theme" } = {}) {
     const fontFaces = families
-        .flatMap((family) => family.faces.map(renderFontFace))
+        .flatMap((family) => [
+            ...family.faces.map(renderFontFace),
+            ...(family.fallbackFace ? [renderFallbackFace(family.fallbackFace)] : []),
+        ])
         .join("\n\n");
 
     const variables = [...groupBySelector(families, cssSelector)]
         .map(([selector, group]) => {
             const declarations = group
                 .map((family) => {
-                    const stack = [quoteFamily(family.name), ...family.fallbacks];
+                    const stack = [
+                        quoteFamily(family.name),
+                        ...(family.fallbackFace
+                            ? [quoteFamily(family.fallbackFace.family)]
+                            : []),
+                        ...family.fallbacks,
+                    ];
                     return `    ${family.cssVariable}: ${stack.join(", ")};`;
                 })
                 .join("\n");
