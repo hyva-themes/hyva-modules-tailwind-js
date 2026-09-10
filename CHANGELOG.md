@@ -9,30 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
--   Added `hyva-fonts`, a command that self hosts the fonts declared in the new
-    `fonts` array of `hyva.config.json`.
+-   Added new Node command `hyva-fonts`, for self hosting the fonts declared in
+    the new `fonts` array of `hyva.config.json`.
 
-    Generates `generated/hyva-fonts.css` and downloads the `woff2` files into
-    `web/fonts/generated`.
-
--   Added the `fontsource` (default), `google-fonts`, `bunny-fonts`, `fontshare`
-    and `local` font providers, selected per family with `provider`.
-
--   Added `cssSelector` to a font family, to declare its CSS variable outside
-    `@theme`.
-
--   Added `adjustFallback` to a font family, generating a metrics matched
-    fallback face. Enabled by default.
-
--   Added `preload` to a font family, generating a layout snippet in
-    `web/fonts/generated/hyva-fonts-preload.xml`.
-
-    A theme that keeps the `hyva-fonts` comments from that snippet in its layout
-    file has the preload hints rewritten on every run.
-
--   Added `--force` and `--strict` flags to `hyva-fonts`.
-
-- Font files are reused between runs through a manifest, so a build makes no network requests unless the configuration changed.
+    Fonts are fetched from `fontsource` (the default), `google-fonts`,
+    `bunny-fonts` or `fontshare`, or taken from the theme itself with `local`,
+    and are reused between runs so a build makes no network requests unless the
+    configuration changed. Each family also takes `cssSelector`,
+    `adjustFallback` and `preload`. See the README for the full list.
 
 ## [1.4.0] - 2026-07-09
 
