@@ -1,7 +1,7 @@
 {
   "name": "@hyva-themes/hyva-modules",
   "version": "1.4.0",
-  "description": "Hyvä-themes TailwindCSS utility functions",
+  "description": "Hyv\u00e4-themes TailwindCSS utility functions",
   "type": "module",
   "homepage": "https://hyva.io",
   "repository": {
@@ -11,7 +11,7 @@
   "bugs": {
     "email": "info@hyva.io"
   },
-  "author": "Hyvä Themes BV",
+  "author": "Hyv\u00e4 Themes BV",
   "license": "OSL-3.0",
   "keywords": [
     "hyva",
@@ -42,7 +42,8 @@
   "bin": {
     "hyva-init": "./bin/init-config.js",
     "hyva-sources": "./bin/generate-sources.js",
-    "hyva-tokens": "./bin/generate-tokens.js"
+    "hyva-tokens": "./bin/generate-tokens.js",
+    "hyva-fonts": "./bin/generate-fonts.js"
   },
   "engines": {
     "node": ">=20"
