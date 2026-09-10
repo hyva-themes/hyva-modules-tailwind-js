@@ -7,6 +7,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+-   Added `hyva-fonts`, a command that self hosts the fonts declared in the
+    new `fonts` array of `hyva.config.json`.
+
+    It generates `generated/hyva-fonts.css` with the `@font-face` rules and a
+    `@theme` block exposing each family as a CSS variable, and downloads the
+    font files into `web/fonts/generated`.
+
+    Five providers are supported. `fontsource`, `google-fonts`, `bunny-fonts`
+    and `fontshare` fetch `woff2` files, `local` uses font files you already
+    have in `web/fonts`. They all take the same options, so switching between
+    them only means changing `provider`.
+
+    `fontsource` is the default, since it is built for self hosting, covers
+    everything on Google Fonts, and publishes a catalogue that lets a wrong
+    weight, style or subset be reported before anything is downloaded.
+
+    Variable fonts are collapsed into a single `@font-face` per subset and
+    style, so requesting several weights does not download the same file
+    more than once.
+
+    A family whose font files are already present, and whose config has not
+    changed, is rebuilt from a `web/fonts/generated/hyva-fonts.json` manifest
+    without contacting its provider, so a normal build makes no network
+    requests and works offline.
+
+    Only the `latin` subset is downloaded by default, matching the choice
+    Fontsource itself makes. Ask for `subsets` explicitly to get more.
+
+    A family can declare its CSS variable outside `@theme` with `cssSelector`,
+    which both keeps it out of Tailwind's theme tree shaking and lets it feed
+    a variable another stylesheet already expects, such as the `--h-family`
+    of the `prose` module. Without it, a family follows `tokens.cssSelector`
+    if the theme set one, and `@theme` otherwise.
+
+    A family marked with `preload` is listed in a generated
+    `web/fonts/generated/hyva-fonts-preload.xml`, a layout snippet to copy into
+    the theme's `Magento_Theme/layout/default_head_blocks.xml`.
+
+    That snippet carries a pair of `hyva-fonts` comments. Keep them, and the
+    command rewrites the region between them on every run, so the preload
+    hints stay in step with the configured fonts. The comments are the opt in,
+    nothing outside them is ever touched, and a theme without them is left
+    alone.
+
+    An empty `generated/hyva-fonts.css` is written when no fonts are
+    configured, so the import can be added up front and keeps working after
+    the last font is removed.
+
+    A provider that cannot be reached falls back to the font files already on
+    disk. A family with neither is skipped with a warning, keeping its CSS
+    variable so text falls back to the next font in the stack, and the rest of
+    the stylesheet is still generated. Pass `--strict` to exit with an error
+    on a warning instead.
+
 ## [1.4.0] - 2026-07-09
 
 ### Added
