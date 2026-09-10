@@ -211,6 +211,7 @@ Nothing is loaded from a third party at runtime, since every font file is served
 | `fallbacks` | `["sans-serif"]` | Appended to the font stack of the CSS variable. Use `[]` for none. |
 | `display` | `swap` | The `font-display` of the generated `@font-face` rules. |
 | `preload` | `false` | Include this family in the generated preload snippet. |
+| `adjustFallback` | `true` | Match the fallback font's metrics to this family, so the page does not shift when the webfont loads. |
 
 Only `woff2` is downloaded. Every browser in use supports it, so an older format only adds weight to your theme.
 
@@ -370,6 +371,53 @@ They end up in the `src` in the order you list them, so put `woff2` first:
 ```
 
 A variant also accepts `unicodeRange`, `stretch` and `display`.
+
+#### Fallback fonts
+
+While a webfont is still loading, text is drawn in the next font in the stack.
+That font is a different width and height, so the page moves when the webfont arrives.
+
+To stop that, the metrics of each family are read from the font file itself, and a second
+`@font-face` is generated that stretches an already installed font to occupy the same space:
+
+```css
+@font-face {
+    font-family: "Inter fallback";
+    src: local("Arial"), local("Liberation Sans"), local("Arimo");
+    size-adjust: 107.3%;
+    ascent-override: 90.28%;
+    descent-override: 22.48%;
+    line-gap-override: 0%;
+}
+
+@theme {
+    --font-sans: Inter, "Inter fallback", ui-sans-serif, system-ui, sans-serif;
+}
+```
+
+Nothing is downloaded for this, it only reshapes a font the visitor already has,
+and it is measured from the file on your disk so it works for a `local` font just as
+well as one from a catalogue.
+
+The font being matched is the first one in `fallbacks` that is recognised.
+A generic name such as `sans-serif` stands in for a representative (`Arial` for
+`sans-serif`, `Times New Roman` for `serif`, `Courier New` for `monospace`), so the
+default already does something sensible. Naming a specific one is more accurate:
+
+```json
+{
+    "fonts": [
+        { "name": "Inter", "fallbacks": ["Arial", "sans-serif"] }
+    ]
+}
+```
+
+`Arial`, `Times New Roman`, `Courier New`, `Georgia`, `Verdana`, `Tahoma` and
+`Trebuchet MS` are recognised, each together with the families that are metrically
+compatible with it, so the adjustment still holds on a machine without the first one.
+
+Set `adjustFallback` to `false` to leave the stack alone.
+A family whose fallbacks are not recognised, such as `cursive`, is left alone anyway.
 
 #### Preloading
 

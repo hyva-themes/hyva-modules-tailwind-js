@@ -43,6 +43,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     of the `prose` module. Without it, a family follows `tokens.cssSelector`
     if the theme set one, and `@theme` otherwise.
 
+    The metrics of each family are read from the font file, and a second
+    `@font-face` is generated that adjusts an already installed font to
+    occupy the same space, so the page does not shift when the webfont
+    arrives. It downloads nothing, works offline, and covers a `local`
+    font as well as one from a catalogue. Set `adjustFallback` to `false`
+    to turn it off.
+
     A family marked with `preload` is listed in a generated
     `web/fonts/generated/hyva-fonts-preload.xml`, a layout snippet to copy into
     the theme's `Magento_Theme/layout/default_head_blocks.xml`.
