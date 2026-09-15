@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+-   Added new Node command `hyva-fonts`, for self hosting the fonts declared in
+    the new `fonts` array of `hyva.config.json`.
+
+    Fonts are fetched from `fontsource` (the default), `google-fonts`,
+    `bunny-fonts` or `fontshare`, or taken from the theme itself with `local`,
+    and are reused between runs so a build makes no network requests unless the
+    configuration changed. Each family also takes `cssSelector`,
+    `adjustFallback` and `preload`. See the README for the full list.
+
 ## [1.4.0] - 2026-07-09
 
 ### Added
