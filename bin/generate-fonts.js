@@ -13,7 +13,7 @@ import { generateFonts } from "../src/fonts/index.js";
 const currentFolderName = path.basename(cwd());
 if (currentFolderName !== "tailwind") {
     consoleError(
-        `Hyvä Fonts should be run from a "tailwind" directory\nto ensure everthing is generated in the correct location.`
+        `Hyvä Fonts should be run from a "tailwind" directory\nto ensure everything is generated in the correct location.`
     );
     exit(1);
 }

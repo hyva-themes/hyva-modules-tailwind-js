@@ -219,7 +219,7 @@ function unicodeSubtable(cmap) {
  * @returns {number|null} width in font units, or null when it cannot be read
  */
 function averageWidth(tables) {
-    const { cmap, hmtx, hhea } = { cmap: tables.cmap, hmtx: tables.hmtx, hhea: tables.hhea };
+    const { cmap, hmtx, hhea } = tables;
     if (!cmap || !hmtx || !hhea) return null;
 
     const subtable = unicodeSubtable(cmap);

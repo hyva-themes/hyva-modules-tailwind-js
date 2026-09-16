@@ -29,7 +29,7 @@ export { PRELOAD_FILE, LAYOUT_TARGET, MARKER_START, MARKER_END, renderPreloadXml
 export { injectPreload, updateLayout } from "./layout.js";
 
 /**
- * Sub folder of "web/fonts" holding the downloaded font files,
+ * Subfolder of "web/fonts" holding the downloaded font files,
  * so it is obvious to the user that its contents are generated.
  */
 export const GENERATED_DIR = "generated";
