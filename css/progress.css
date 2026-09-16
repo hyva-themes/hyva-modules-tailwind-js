@@ -1,0 +1,38 @@
+@layer base {
+    progress {
+        --progress-bar-color: var(--color-primary);
+        --progress-bar-radius: 9999px;
+        display: block;
+        inline-size: 100%;
+        block-size: 0.875rem;
+        border: 1px solid transparent;
+        border-radius: var(--progress-bar-radius);
+        background-color: color-mix(in srgb, currentcolor 10%, transparent);
+        appearance: none;
+    }
+
+    progress::-webkit-progress-bar {
+        background-color: transparent;
+        border-radius: var(--progress-bar-radius);
+    }
+
+    progress::-webkit-progress-value {
+        background-color: var(--progress-bar-color);
+        border-radius: var(--progress-bar-radius);
+    }
+
+    progress::-moz-progress-bar {
+        background-color: var(--progress-bar-color);
+        border-radius: var(--progress-bar-radius);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        progress::-webkit-progress-value {
+            transition: width 0.3s ease;
+        }
+
+        progress::-moz-progress-bar {
+            transition: width 0.3s ease;
+        }
+    }
+}

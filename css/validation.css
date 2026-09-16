@@ -1,0 +1,33 @@
+@theme {
+    --form-error-color: var(--color-red-600);
+    --form-info-color: color-mix(in srgb, currentcolor 64%, transparent);
+}
+
+@layer base {
+    :where(
+        :user-invalid,
+        :is(input, textarea, select)[aria-invalid="true"],
+        .input-group:has(:user-invalid, [aria-invalid="true"])
+    ) {
+        &:not(:focus, :focus-within) {
+            --form-stroke: var(--form-error-color);
+            outline: 1px solid var(--form-stroke);
+        }
+    }
+
+    :where(fieldset[aria-invalid="true"]:not(:focus-within)) {
+        --form-stroke: var(--form-error-color);
+    }
+}
+
+@utility form-info-text {
+    color: var(--form-info-color);
+    font-size: 0.875em;
+    font-style: italic;
+}
+
+@utility form-error-text {
+    color: var(--form-error-color);
+    font-size: 0.875em;
+    font-weight: bolder;
+}

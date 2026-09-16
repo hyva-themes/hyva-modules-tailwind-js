@@ -2,5 +2,7 @@
 
 @import "./prose.css";
 @import "./forms.css";
+@import "./progress.css";
+@import "./validation.css";
 
 @import "./fallback.css";

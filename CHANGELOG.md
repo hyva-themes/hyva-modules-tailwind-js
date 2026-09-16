@@ -18,6 +18,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     configuration changed. Each family also takes `cssSelector`,
     `adjustFallback` and `preload`. See the README for the full list.
 
+-   Added base styles for the `<progress>` element.
+
+    Progress bars get a consistent cross browser look, themable with
+    `--progress-bar-color` and `--progress-bar-radius`.
+
+-   Added base styles for form validation.
+
+    Invalid fields (`:user-invalid` or `aria-invalid="true"`) get an error
+    outline while unfocused, and the new `form-error-text` and
+    `form-info-text` utilities style their messages. Colors come from
+    `--form-error-color` and `--form-info-color`.
+
 ## [1.4.0] - 2026-07-09
 
 ### Added
