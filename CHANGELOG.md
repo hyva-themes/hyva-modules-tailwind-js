@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-09-16
+
 ### Added
 
 -   Added new Node command `hyva-fonts`, for self hosting the fonts declared in
@@ -16,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     `bunny-fonts` or `fontshare`, or taken from the theme itself with `local`,
     and are reused between runs so a build makes no network requests unless the
     configuration changed. Each family also takes `cssSelector`,
-    `adjustFallback` and `preload`. See the README for the full list.
+    `adjustFallback` and `preload`. See `docs/fonts.md` for the full list.
 
 -   Added base styles for the `<progress>` element.
 
@@ -215,7 +217,8 @@ Fixes and updates
 
 Initial Release 🎉
 
-[unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.4.0...HEAD
+[unreleased]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.5.0...HEAD
+[1.5.0]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.4.0...1.5.0
 [1.4.0]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.3.0...1.4.0
 [1.3.0]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.4...1.3.0
 [1.2.4]: https://github.com/hyva-themes/hyva-modules-tailwind-js/compare/1.2.3...1.2.4
