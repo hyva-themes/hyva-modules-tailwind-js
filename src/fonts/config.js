@@ -79,6 +79,54 @@ export function normalizeWeight(weight) {
     return { api: value, css: value, slug: value };
 }
 
+/**
+ * Read the lowest and highest weight a normalized weight covers.
+ *
+ * @param {{ api: string }} weight - Normalized weight.
+ * @returns {[number, number]} lowest and highest weight
+ */
+const weightBounds = (weight) => {
+    const [min, max = min] = weight.api.split("..").map(Number);
+    return [min, max];
+};
+
+/**
+ * Sort weights numerically and drop exact duplicates.
+ *
+ * The CSS2 API requires axis values in ascending order and rejects a
+ * repeated one, and a stable order keeps the manifest cache key the same
+ * however the weights were written.
+ *
+ * @param {Object[]} weights - Normalized weights.
+ * @returns {Object[]} sorted, unique weights
+ */
+export function sortWeights(weights) {
+    const unique = [...new Map(weights.map((weight) => [weight.api, weight])).values()];
+
+    return unique.sort((a, b) => {
+        const [aMin, aMax] = weightBounds(a);
+        const [bMin, bMax] = weightBounds(b);
+        return aMin - bMin || aMax - bMax;
+    });
+}
+
+/**
+ * Find a weight that falls inside the weight before it, such as "400" next
+ * to "300 700". Both would describe the same weight, which the CSS2 API
+ * rejects and which would otherwise produce two competing @font-face rules.
+ *
+ * @param {Object[]} weights - Sorted, unique weights.
+ * @returns {[Object, Object]|null} the overlapping pair, or null
+ */
+function findOverlap(weights) {
+    for (let i = 1; i < weights.length; i++) {
+        if (weightBounds(weights[i])[0] <= weightBounds(weights[i - 1])[1]) {
+            return [weights[i - 1], weights[i]];
+        }
+    }
+    return null;
+}
+
 const toArray = (value) =>
     value === undefined || value === null
         ? []
@@ -189,9 +237,19 @@ function normalizeFont(font, index, errors) {
         return null;
     }
 
-    const weights = (
-        toArray(font.weights).length ? toArray(font.weights) : DEFAULT_WEIGHTS
-    ).map(normalizeWeight);
+    const weights = sortWeights(
+        (toArray(font.weights).length ? toArray(font.weights) : DEFAULT_WEIGHTS).map(
+            normalizeWeight
+        )
+    );
+
+    const overlap = findOverlap(weights);
+    if (overlap) {
+        errors.push(
+            `${label}.weights lists "${overlap[1].css}" and "${overlap[0].css}", which cover the same weight. Use either the range or the single weights.`
+        );
+        return null;
+    }
 
     const ranges = weights.filter((weight) => weight.css.includes(" "));
     if (ranges.length && !provider.variable) {

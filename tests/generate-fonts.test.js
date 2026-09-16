@@ -16,6 +16,7 @@ import { normalizeFonts, slugify } from "../src/fonts/config.js";
 import { mergeVariableFaces } from "../src/fonts/api/faces.js";
 import { parseFontFaces } from "../src/fonts/api/stylesheet.js";
 import { providers } from "../src/fonts/providers/index.js";
+import { cacheKey } from "../src/fonts/manifest.js";
 import { generateFonts } from "../src/fonts/index.js";
 import { readMetrics } from "../src/fonts/metrics.js";
 import { buildFallbackFace, pickFallback } from "../src/fonts/fallback.js";
@@ -178,6 +179,39 @@ describe("config", () => {
         assert.equal(fonts[0].weights[0].css, "300 700");
     });
 
+    test("sorts weights numerically and drops duplicates", () => {
+        const { fonts } = normalizeFonts([
+            { name: "Roboto", weights: ["900", "100", 400, "400", "700"] },
+        ]);
+        assert.deepEqual(
+            fonts[0].weights.map((weight) => weight.api),
+            ["100", "400", "700", "900"]
+        );
+    });
+
+    test("sorts a range by where it starts", () => {
+        const { fonts } = normalizeFonts([{ name: "Roboto", weights: ["800 900", "100", "300 500"] }]);
+        assert.deepEqual(
+            fonts[0].weights.map((weight) => weight.api),
+            ["100", "300..500", "800..900"]
+        );
+    });
+
+    test("refuses a weight that falls inside a range", () => {
+        const { errors } = normalizeFonts([{ name: "Roboto", weights: ["300 700", "400"] }]);
+        assert.match(errors[0], /lists "400" and "300 700", which cover the same weight/);
+    });
+
+    test("refuses ranges that overlap", () => {
+        const { errors } = normalizeFonts([{ name: "Roboto", weights: ["400 700", "300 500"] }]);
+        assert.match(errors[0], /lists "400 700" and "300 500", which cover the same weight/);
+    });
+
+    test("keeps the cache key the same however the weights are ordered", () => {
+        const key = (weights) => cacheKey(normalizeFonts([{ name: "Roboto", weights }]).fonts[0]);
+        assert.equal(key(["700", "400"]), key(["400", "700"]));
+    });
+
     test("reports every invalid entry at once", () => {
         const { errors } = normalizeFonts([
             { provider: "typekit", name: "Roboto" },
@@ -231,6 +265,13 @@ describe("css2 api", () => {
         assert.match(
             buildRequestUrl(font({ weights: ["400", "700"], styles: ["normal", "italic"] })),
             /family=Acme\+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap$/
+        );
+    });
+
+    test("requests the weights in ascending order however they were configured", () => {
+        assert.match(
+            buildRequestUrl(font({ weights: ["700", "300 500", "100"], styles: ["italic", "normal"] })),
+            /family=Acme\+Sans:ital,wght@0,100;0,300\.\.500;0,700;1,100;1,300\.\.500;1,700&display=swap$/
         );
     });
 
