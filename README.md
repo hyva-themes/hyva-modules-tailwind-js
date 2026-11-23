@@ -81,7 +81,7 @@ Modules you don't want are excluded in the same config:
 
 ### `hyva-tokens`
 
-Generates Tailwind theme variables from a design token file, a Figma or Google Stitch export,
+Generates Tailwind theme variables from a design token file (including Design Tokens 2025.10), a Figma or Google Stitch export,
 or values written directly in `hyva.config.json`.
 
 ```json

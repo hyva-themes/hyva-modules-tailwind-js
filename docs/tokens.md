@@ -20,6 +20,31 @@ All options live under the `tokens` key of `hyva.config.json`.
 | `stripPrefix` | (none)                                    | A dotted key path to unwrap, such as `tokens.values`.                 |
 | `rename`      | (none)                                    | A map of group names to rename, such as `{ "colors": "color" }`.      |
 
+## Design Tokens 2025.10
+
+Token files following the [Design Tokens 2025.10](https://www.designtokens.org/tr/2025.10/format/) specification
+work without a `format` key, and so do Resolver documents (all sets are merged in their resolution order).
+Structured values are converted to CSS, and `$type` is inherited from its group:
+
+```json
+{
+    "color": {
+        "$type": "color",
+        "primary": { "$value": { "colorSpace": "srgb", "components": [0, 0.4, 0.8] } }
+    },
+    "spacing": {
+        "$type": "dimension",
+        "sm": { "$value": { "value": 8, "unit": "px" } }
+    }
+}
+```
+
+This generates `--color-primary: color(srgb 0 0.4 0.8);` and `--spacing-sm: 8px;`.
+
+A reference such as `{color.primary}` becomes `var(--color-primary)`.
+Camel case keys are written in kebab case, so `{fontFamilies.standard}` becomes `var(--font-families-standard)`,
+the same name as the generated variable.
+
 ## Figma
 
 If you use **Figma**, point `tokens.src` at the exported file.
