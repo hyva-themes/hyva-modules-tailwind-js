@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+-   The `hyva-tokens` command now reads token files in the
+    [Design Tokens 2025.10](https://www.designtokens.org/tr/2025.10/format/) format,
+    including Resolver documents, with no extra `format` setting.
+
+    Structured values such as color objects and dimensions are converted to
+    CSS values, and `$type` is inherited from its group.
+
+### Fixed
+
+-   Token references to a camel case key, such as `{fontFamilies.standard}`,
+    now point to the kebab case variable that is generated for that token
+    (`var(--font-families-standard)` instead of `var(--fontFamilies-standard)`).
+
 ### Changed
 
 -   The `hyva-fonts` command now uses [`@fylgja/fonts-provider`](https://github.com/fylgja/js-fonts-provider)
