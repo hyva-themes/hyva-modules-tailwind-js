@@ -90,8 +90,8 @@ test("generates font-size tokens", async () => {
 test("converts token references to CSS variables", async () => {
     const css = await readFile(generatedFile, "utf8");
     assert.ok(
-        css.includes("var(--fontFamilies-standard)"),
-        "should convert {fontFamilies.standard} to var(--fontFamilies-standard)"
+        css.includes("var(--font-families-standard)"),
+        "should convert {fontFamilies.standard} to var(--font-families-standard)"
     );
 });
 
