@@ -42,6 +42,9 @@ and keeps working after you remove your last font.
 
 Nothing is loaded from a third party at runtime, since every font file is served from your own theme.
 
+The providers, validation and CSS come from [`@fylgja/fonts-provider`](https://github.com/fylgja/js-fonts-provider),
+which needs Node 22 or newer.
+
 ## Options
 
 | Key              | Default                             | Description                                                                                          |
@@ -54,7 +57,7 @@ Nothing is loaded from a third party at runtime, since every font file is served
 | `styles`         | `["normal"]`                        | Any combination of `normal` and `italic`.                                                            |
 | `weights`        | `["400"]`                           | The weights to download.                                                                             |
 | `subsets`        | `["latin"]`                         | The character subsets to download. Ignored by `fontshare`.                                           |
-| `fallbacks`      | `["sans-serif"]`                    | Appended to the font stack of the CSS variable. Use `[]` for none.                                   |
+| `fallbacks`      | `["sans-serif"]`                    | Appended to the font stack of the CSS variable.                                                      |
 | `display`        | `swap`                              | The `font-display` of the generated `@font-face` rules.                                              |
 | `preload`        | `false`                             | Include this family in the generated preload snippet.                                                |
 | `adjustFallback` | `true`                              | Match the fallback font's metrics to this family, so the page does not shift when the webfont loads. |
@@ -275,6 +278,7 @@ compatible with it, so the adjustment still holds on a machine without the first
 
 Set `adjustFallback` to `false` to leave the stack alone.
 A family whose fallbacks are not recognised, such as `cursive`, is left alone anyway.
+When the font file cannot be measured, the family gets no adjusted face and the command warns about it.
 
 ## Preloading
 
@@ -394,7 +398,7 @@ the stack instead of losing its styling:
 The command succeeds in that case, so a warning never stops your CSS from building.
 Use `npx hyva-fonts --strict` to exit with an error instead, which is what you want in CI.
 
-Nothing is removed from `web/fonts/generated` after a warning, since a run that could not confirm every
-family does not know which files are still needed.
+Nothing is removed from `web/fonts/generated` when a family could not be resolved or one of its files
+could not be downloaded, since a run that could not confirm every family does not know which files are still needed.
 
 Use `npx hyva-fonts --force` to ignore `hyva-fonts.json` and fetch everything again.

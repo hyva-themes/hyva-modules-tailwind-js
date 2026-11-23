@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+-   The `hyva-fonts` command now uses [`@fylgja/fonts-provider`](https://github.com/fylgja/js-fonts-provider)
+    for the providers, the config validation, the downloads and the fallback metrics.
+
+    The generated CSS and font files are the same, and an existing
+    `hyva-fonts.json` is reused, so a theme needs no new download.
+
+-   Requires Node 22 or newer, which `@fylgja/fonts-provider` needs.
+
+-   The `fonts` configuration is validated more strictly. Every option must
+    have the right type, so `"preload": "true"` is now an error, and every value
+    that ends up in the CSS, a file name or a URL is checked. Downloads must
+    come over https from the provider's own hosts and be a woff2 file.
+
+-   `"fallbacks": []` now gives the default `["sans-serif"]` instead of an
+    empty font stack.
+
+-   A font that cannot be measured for its adjusted fallback now gives a
+    warning. Unused font files are still removed in that case, pruning is only
+    skipped when a family could not be resolved or downloaded.
+
+### Removed
+
+-   The `renderFontsCss`, `renderFontFace`, `providers` and `providerIds`
+    exports of `src/fonts/index.js`, along with the modules behind them.
+
 ## [1.5.0] - 2026-09-16
 
 ### Added

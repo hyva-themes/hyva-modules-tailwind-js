@@ -83,7 +83,7 @@ export function injectPreload(xml, lines) {
  * file at all, is left untouched and told nothing, since the generated
  * snippet already explains how to opt in.
  *
- * @param {Object[]} families - Resolved families, with `files` relative to
+ * @param {{ family: string, file: string }[]} preloads - Files relative to
  *        the theme's "web/fonts" folder.
  * @param {Object} options
  * @param {string} options.themeDir - Absolute path to the theme root.
@@ -92,11 +92,11 @@ export function injectPreload(xml, lines) {
  *          state of the managed region, or null when the theme did not opt in
  * @throws {Error} when the markers are unusable
  */
-export async function updateLayout(families, { themeDir, file = LAYOUT_TARGET }) {
+export async function updateLayout(preloads, { themeDir, file = LAYOUT_TARGET }) {
     const layoutFile = path.join(themeDir, file);
     if (!existsSync(layoutFile)) return null;
 
-    const lines = fontElements(families);
+    const lines = fontElements(preloads);
     const result = injectPreload(readFileSync(layoutFile, "utf8"), lines);
 
     if (!result) return null;

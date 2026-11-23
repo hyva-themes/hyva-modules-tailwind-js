@@ -12,15 +12,7 @@ import { readFile, readdir, rm, mkdir, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { normalizeFonts, slugify } from "../src/fonts/config.js";
-import { mergeVariableFaces } from "../src/fonts/api/faces.js";
-import { parseFontFaces } from "../src/fonts/api/stylesheet.js";
-import { providers } from "../src/fonts/providers/index.js";
-import { cacheKey } from "../src/fonts/manifest.js";
-import { generateFonts } from "../src/fonts/index.js";
-import { readMetrics } from "../src/fonts/metrics.js";
-import { buildFallbackFace, pickFallback } from "../src/fonts/fallback.js";
-import { renderFallbackFace } from "../src/fonts/css.js";
+import { cacheKey, generateFonts, normalizeFonts } from "../src/fonts/index.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const themeDir = resolve(__dirname, "fixtures/fonts-theme");
@@ -68,6 +60,91 @@ const googleFontsCss = `
 }
 `;
 
+const UNITS_PER_EM = 1000;
+const ADVANCE = 1000;
+const GLYPHS = 92;
+
+/** A cmap mapping every character from space to "z" onto its own glyph. */
+const cmapTable = () => {
+    const segCount = 2;
+    const table = Buffer.alloc(16 + segCount * 8);
+    table.writeUInt16BE(4, 0);
+    table.writeUInt16BE(table.length, 2);
+    table.writeUInt16BE(segCount * 2, 6);
+    table.writeUInt16BE(0x7a, 14);
+    table.writeUInt16BE(0xffff, 16);
+    table.writeUInt16BE(0x20, 20);
+    table.writeUInt16BE(0xffff, 22);
+    table.writeInt16BE(1 - 0x20, 24);
+    table.writeInt16BE(1, 26);
+
+    const cmap = Buffer.alloc(12 + table.length);
+    cmap.writeUInt16BE(1, 2);
+    cmap.writeUInt16BE(3, 4);
+    cmap.writeUInt16BE(1, 6);
+    cmap.writeUInt32BE(12, 8);
+    table.copy(cmap, 12);
+    return cmap;
+};
+
+/** The tables of a font whose every glyph is exactly ADVANCE wide. */
+const fontTables = () => {
+    const head = Buffer.alloc(54);
+    head.writeUInt16BE(UNITS_PER_EM, 18);
+
+    const hhea = Buffer.alloc(36);
+    hhea.writeInt16BE(800, 4);
+    hhea.writeInt16BE(-200, 6);
+    hhea.writeInt16BE(0, 8);
+    hhea.writeUInt16BE(GLYPHS, 34);
+
+    const hmtx = Buffer.alloc(GLYPHS * 4);
+    for (let i = 0; i < GLYPHS; i++) hmtx.writeUInt16BE(ADVANCE, i * 4);
+
+    return [
+        ["cmap", cmapTable()],
+        ["head", head],
+        ["hhea", hhea],
+        ["hmtx", hmtx],
+        ["OS/2", Buffer.alloc(96)],
+    ];
+};
+
+/** Pack the same tables as a woff2, which is what a provider serves. */
+const buildWoff2 = () => {
+    const tables = fontTables();
+    const indexes = { cmap: 0, head: 1, hhea: 2, hmtx: 3, "OS/2": 6 };
+
+    const base128 = (value) => {
+        const bytes = [];
+        do {
+            bytes.unshift(value & 0x7f);
+            value >>>= 7;
+        } while (value);
+        for (let i = 0; i < bytes.length - 1; i++) bytes[i] |= 0x80;
+        return Buffer.from(bytes);
+    };
+
+    const directory = Buffer.concat(
+        tables.map(([tag, data]) =>
+            Buffer.concat([Buffer.from([indexes[tag]]), base128(data.length)])
+        )
+    );
+    const compressed = brotliCompressSync(
+        Buffer.concat(tables.map(([, data]) => data))
+    );
+
+    const header = Buffer.alloc(48);
+    header.write("wOF2", 0, "latin1");
+    header.writeUInt16BE(tables.length, 12);
+    header.writeUInt32BE(compressed.length, 20);
+
+    return Buffer.concat([header, directory, compressed]);
+};
+
+/** A valid woff2, measurable for the fallback face. */
+const woff2 = buildWoff2();
+
 /**
  * Keep only the @font-face rules matching the axis of a CSS2 request,
  * so the mock responds like the real API instead of serving every rule.
@@ -102,13 +179,9 @@ const createFetchMock = () => {
     const fetchImpl = async (url) => {
         requests.push(url);
         if (url.startsWith("https://fonts.googleapis.com")) {
-            return { ok: true, status: 200, text: async () => respondToAxis(url) };
+            return new Response(respondToAxis(url));
         }
-        return {
-            ok: true,
-            status: 200,
-            arrayBuffer: async () => new TextEncoder().encode(url).buffer,
-        };
+        return new Response(woff2);
     };
     return { fetchImpl, requests };
 };
@@ -144,157 +217,6 @@ beforeEach(async () => {
 
 after(async () => {
     await rm(themeDir, { recursive: true, force: true });
-});
-
-describe("config", () => {
-    test("derives a css variable from the font name", () => {
-        const { fonts } = normalizeFonts([{ name: "IBM Plex Sans" }]);
-        assert.equal(fonts[0].cssVariable, "--font-ibm-plex-sans");
-    });
-
-    test("keeps an explicit css variable and adds the missing dashes", () => {
-        const { fonts } = normalizeFonts([
-            { name: "Roboto", cssVariable: "--font-body" },
-            { name: "Lora", cssVariable: "font-heading" },
-        ]);
-        assert.equal(fonts[0].cssVariable, "--font-body");
-        assert.equal(fonts[1].cssVariable, "--font-heading");
-    });
-
-    test("defaults to fontsource, normal, 400 and the latin subset", () => {
-        const { fonts } = normalizeFonts([{ name: "Roboto" }]);
-        assert.equal(fonts[0].provider, "fontsource");
-        assert.deepEqual(fonts[0].styles, ["normal"]);
-        assert.deepEqual(
-            fonts[0].weights.map((weight) => weight.css),
-            ["400"]
-        );
-        assert.deepEqual(fonts[0].subsets, ["latin"]);
-        assert.equal(fonts[0].display, "swap");
-    });
-
-    test("reads a weight range as a variable font axis", () => {
-        const { fonts } = normalizeFonts([{ name: "Roboto", weights: ["300 700"] }]);
-        assert.equal(fonts[0].weights[0].api, "300..700");
-        assert.equal(fonts[0].weights[0].css, "300 700");
-    });
-
-    test("sorts weights numerically and drops duplicates", () => {
-        const { fonts } = normalizeFonts([
-            { name: "Roboto", weights: ["900", "100", 400, "400", "700"] },
-        ]);
-        assert.deepEqual(
-            fonts[0].weights.map((weight) => weight.api),
-            ["100", "400", "700", "900"]
-        );
-    });
-
-    test("sorts a range by where it starts", () => {
-        const { fonts } = normalizeFonts([{ name: "Roboto", weights: ["800 900", "100", "300 500"] }]);
-        assert.deepEqual(
-            fonts[0].weights.map((weight) => weight.api),
-            ["100", "300..500", "800..900"]
-        );
-    });
-
-    test("refuses a weight that falls inside a range", () => {
-        const { errors } = normalizeFonts([{ name: "Roboto", weights: ["300 700", "400"] }]);
-        assert.match(errors[0], /lists "400" and "300 700", which cover the same weight/);
-    });
-
-    test("refuses ranges that overlap", () => {
-        const { errors } = normalizeFonts([{ name: "Roboto", weights: ["400 700", "300 500"] }]);
-        assert.match(errors[0], /lists "400 700" and "300 500", which cover the same weight/);
-    });
-
-    test("keeps the cache key the same however the weights are ordered", () => {
-        const key = (weights) => cacheKey(normalizeFonts([{ name: "Roboto", weights }]).fonts[0]);
-        assert.equal(key(["700", "400"]), key(["400", "700"]));
-    });
-
-    test("reports every invalid entry at once", () => {
-        const { errors } = normalizeFonts([
-            { provider: "typekit", name: "Roboto" },
-            { name: "" },
-            { name: "Lora", styles: ["oblique"] },
-            { provider: "local", name: "Acme" },
-        ]);
-        assert.equal(errors.length, 4);
-        assert.match(errors[0], /provider "typekit" is not supported/);
-        assert.match(errors[1], /name is required/);
-        assert.match(errors[2], /only supports "normal" and "italic"/);
-        assert.match(errors[3], /variants is required/);
-    });
-
-    test("reports duplicate css variables", () => {
-        const { errors } = normalizeFonts([{ name: "Roboto" }, { name: "roboto" }]);
-        assert.match(errors[0], /Duplicate cssVariable "--font-roboto"/);
-    });
-
-    test("derives the provider id from the name, and lets id override it", () => {
-        const { fonts } = normalizeFonts([
-            { name: "IBM Plex Sans" },
-            { name: "Acme", cssVariable: "--font-acme-two", id: "acme-grotesk" },
-        ]);
-        assert.equal(fonts[0].id, "ibm-plex-sans");
-        assert.equal(fonts[1].id, "acme-grotesk");
-    });
-
-    test("slugifies on the separators in the name, not inside a word", () => {
-        assert.equal(slugify("Jost*"), "jost");
-        assert.equal(slugify("Crète Sans"), "crete-sans");
-        assert.equal(slugify("JetBrains Mono"), "jetbrains-mono");
-        assert.equal(slugify("DejaVu Sans"), "dejavu-sans");
-        assert.equal(slugify("iA Writer Duo"), "ia-writer-duo");
-    });
-});
-
-describe("css2 api", () => {
-    const font = (overrides) =>
-        normalizeFonts([{ provider: "google-fonts", name: "Acme Sans", ...overrides }]).fonts[0];
-    const buildRequestUrl = (value) => providers["google-fonts"].buildRequestUrl(value);
-
-    test("requests a single axis when there is no italic", () => {
-        assert.match(
-            buildRequestUrl(font({ weights: ["400", "700"] })),
-            /family=Acme\+Sans:wght@400;700&display=swap$/
-        );
-    });
-
-    test("requests ital tuples when italic is included", () => {
-        assert.match(
-            buildRequestUrl(font({ weights: ["400", "700"], styles: ["normal", "italic"] })),
-            /family=Acme\+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap$/
-        );
-    });
-
-    test("requests the weights in ascending order however they were configured", () => {
-        assert.match(
-            buildRequestUrl(font({ weights: ["700", "300 500", "100"], styles: ["italic", "normal"] })),
-            /family=Acme\+Sans:ital,wght@0,100;0,300\.\.500;0,700;1,100;1,300\.\.500;1,700&display=swap$/
-        );
-    });
-
-    test("merges the faces of a variable font into one weight range", () => {
-        const faces = mergeVariableFaces([
-            { url: "a.woff2", style: "normal", weight: "300" },
-            { url: "a.woff2", style: "normal", weight: "700" },
-            { url: "b.woff2", style: "italic", weight: "400" },
-        ]);
-        assert.equal(faces.length, 2);
-        assert.equal(faces[0].weight, "300 700");
-        assert.equal(faces[1].weight, "400");
-    });
-
-    test("reads the subset from the comment above each rule", () => {
-        const faces = parseFontFaces(googleFontsCss);
-        assert.deepEqual(
-            [...new Set(faces.map((face) => face.subset))],
-            ["latin-ext", "latin"]
-        );
-        assert.equal(faces[0].family, "Acme Sans");
-        assert.equal(faces[0].unicodeRange, "U+0100-02BA");
-    });
 });
 
 describe("generate", () => {
@@ -351,8 +273,8 @@ describe("generate", () => {
         });
         const css = await readFile(cssFile, "utf8");
         assert.ok(css.includes("@theme {"), "should contain @theme selector");
-        assert.ok(css.includes('--font-acme-sans: "Acme Sans", sans-serif;'));
-        assert.ok(css.includes('--font-heading: "Acme Sans", Georgia, serif;'));
+        assert.ok(css.includes('--font-acme-sans: "Acme Sans", "Acme Sans fallback", sans-serif;'));
+        assert.ok(css.includes('--font-heading: "Acme Sans", "Acme Sans fallback", Georgia, serif;'));
     });
 
     test("puts a family in its own cssSelector when it names one", async () => {
@@ -371,11 +293,11 @@ describe("generate", () => {
 
         const css = await readFile(cssFile, "utf8");
         assert.ok(
-            css.includes('@theme {\n    --font-acme-sans: "Acme Sans", sans-serif;\n}'),
+            css.includes('@theme {\n    --font-acme-sans: "Acme Sans", "Acme Sans fallback", sans-serif;\n}'),
             "the default selector keeps the families that did not name one"
         );
         assert.ok(
-            css.includes('.prose {\n    --h-family: "Acme Sans", serif;\n}'),
+            css.includes('.prose {\n    --h-family: "Acme Sans", "Acme Sans fallback", serif;\n}'),
             "the named selector gets its own block"
         );
     });
@@ -448,15 +370,14 @@ describe("generate", () => {
     });
 
     test("leaves local font files alone", async () => {
-        await writeFile(resolve(fontsDir, "acme-icons.woff2"), "font");
-        await writeFile(resolve(fontsDir, "acme-icons.woff"), "font");
+        await writeFile(resolve(fontsDir, "acme-icons.woff2"), woff2);
+        await writeFile(resolve(fontsDir, "acme-icons.woff"), woff2);
 
         const result = await run({
             fonts: [
                 {
                     provider: "local",
                     name: "Acme Icons",
-                    fallbacks: [],
                     variants: [{ weight: "400", src: ["acme-icons.woff2", "acme-icons.woff"] }],
                 },
             ],
@@ -472,7 +393,7 @@ describe("generate", () => {
             ),
             "should list both formats in source order"
         );
-        assert.ok(css.includes('--font-acme-icons: "Acme Icons";'));
+        assert.ok(css.includes('--font-acme-icons: "Acme Icons", "Acme Icons fallback", sans-serif;'));
     });
 
     test("warns and drops the family when a local font file is missing", async () => {
@@ -497,11 +418,8 @@ describe("generate", () => {
 
     test("reports the reason Google Fonts rejected a family", async () => {
         const mock = {
-            fetchImpl: async () => ({
-                ok: false,
-                status: 400,
-                text: async () => "<title>400: Font family not found</title>",
-            }),
+            fetchImpl: async () =>
+                new Response("<title>400: Font family not found</title>", { status: 400 }),
             requests: [],
         };
         assertWarns(
@@ -530,37 +448,6 @@ const bunnyCss = `
 }
 `;
 
-const fontshareCss = `
-/* Acme Sans */
-@font-face {
-  font-family: 'Acme Sans';
-  src: url('//cdn.fontshare.com/wf/AAA/BBB/CCC.woff2') format('woff2'),
-       url('//cdn.fontshare.com/wf/AAA/BBB/CCC.woff') format('woff'),
-       url('//cdn.fontshare.com/wf/AAA/BBB/CCC.ttf') format('truetype');
-  font-weight: 400;
-  font-display: swap;
-  font-style: normal;
-}
-@font-face {
-  font-family: 'Acme Sans';
-  src: url('//cdn.fontshare.com/wf/DDD/EEE/FFF.woff2') format('woff2'),
-       url('//cdn.fontshare.com/wf/DDD/EEE/FFF.woff') format('woff');
-  font-weight: 400;
-  font-display: swap;
-  font-style: italic;
-}
-`;
-
-const fontsourceMeta = {
-    id: "acme-sans",
-    family: "Acme Sans",
-    subsets: ["latin", "latin-ext"],
-    weights: [400, 700],
-    styles: ["normal", "italic"],
-    variable: true,
-    unicodeRange: { latin: "U+0000-00FF", "latin-ext": "U+0100-02BA" },
-};
-
 /**
  * Serves a fixed stylesheet or JSON body, and dummy font files for anything else.
  *
@@ -575,233 +462,14 @@ const createRouteMock = (routes) => {
 
         if (match) {
             const body = routes[match];
-            if (typeof body === "number") return { ok: false, status: body, text: async () => "" };
-            return typeof body === "string"
-                ? { ok: true, status: 200, text: async () => body }
-                : { ok: true, status: 200, json: async () => body };
+            if (typeof body === "number") return new Response("", { status: body });
+            return new Response(typeof body === "string" ? body : JSON.stringify(body));
         }
 
-        return {
-            ok: true,
-            status: 200,
-            arrayBuffer: async () => new TextEncoder().encode(url).buffer,
-        };
+        return new Response(woff2);
     };
     return { fetchImpl, requests };
 };
-
-describe("bunny fonts", () => {
-    test("requests the bunny endpoint with the css2 syntax", () => {
-        const { fonts } = normalizeFonts([
-            { provider: "bunny-fonts", name: "Acme Sans", weights: ["400", "700"] },
-        ]);
-        assert.equal(
-            providers["bunny-fonts"].buildRequestUrl(fonts[0]),
-            "https://fonts.bunny.net/css2?family=Acme+Sans:wght@400;700&display=swap"
-        );
-    });
-
-    test("rejects a weight range, since bunny only serves static files", () => {
-        const { errors } = normalizeFonts([
-            { provider: "bunny-fonts", name: "Acme Sans", weights: ["300 700"] },
-        ]);
-        assert.match(errors[0], /"300 700", which Bunny Fonts does not serve/);
-    });
-
-    test("takes the woff2 out of a multi format src", async () => {
-        const mock = createRouteMock({ "fonts.bunny.net/css2": bunnyCss });
-        await run(
-            { fonts: [{ provider: "bunny-fonts", name: "Acme Sans", subsets: ["latin"] }] },
-            { mock }
-        );
-
-        const css = await readFile(cssFile, "utf8");
-        assert.ok(css.includes('format("woff2")'));
-        assert.ok(!css.includes('format("woff")'), "should not keep the woff fallback");
-        assert.deepEqual(await fontFiles(), ["acme-sans-latin-400-normal.woff2"]);
-    });
-
-    test("reports the error bunny returns with a 200 status", async () => {
-        const mock = createRouteMock({
-            "fonts.bunny.net/css2":
-                "/*\n    Error: API Error \n    Details: Please specify a valid font on the 'family' parameter. \n*/",
-        });
-        assertWarns(
-            await run({ fonts: [{ provider: "bunny-fonts", name: "NotAFont" }] }, { mock }),
-            /Bunny Fonts returned no woff2 files for "NotAFont": Please specify a valid font/
-        );
-    });
-});
-
-describe("fontshare", () => {
-    test("numbers a variant as the weight, plus one for italic", () => {
-        const { fonts } = normalizeFonts([
-            {
-                provider: "fontshare",
-                name: "Acme Sans",
-                weights: ["400", "700"],
-                styles: ["normal", "italic"],
-            },
-        ]);
-        assert.equal(
-            providers.fontshare.buildRequestUrl(fonts[0]),
-            "https://api.fontshare.com/v2/css?f[]=acme-sans@400,401,700,701"
-        );
-    });
-
-    test("ignores subsets, since fontshare serves one file per variant", async () => {
-        const mock = createRouteMock({ "api.fontshare.com": fontshareCss });
-        await run(
-            {
-                fonts: [
-                    {
-                        provider: "fontshare",
-                        name: "Acme Sans",
-                        styles: ["normal", "italic"],
-                        subsets: ["latin"],
-                    },
-                ],
-            },
-            { mock }
-        );
-
-        assert.deepEqual(await fontFiles(), [
-            "acme-sans-400-italic.woff2",
-            "acme-sans-400-normal.woff2",
-        ]);
-    });
-
-    test("makes the protocol relative cdn url absolute", async () => {
-        const mock = createRouteMock({ "api.fontshare.com": fontshareCss });
-        const result = await run(
-            { fonts: [{ provider: "fontshare", name: "Acme Sans" }] },
-            { mock }
-        );
-        assert.ok(
-            result.requests.some((url) => url === "https://cdn.fontshare.com/wf/AAA/BBB/CCC.woff2"),
-            "should download over https"
-        );
-    });
-
-    test("fails when fontshare silently drops a requested variant", async () => {
-        const mock = createRouteMock({ "api.fontshare.com": fontshareCss });
-        assertWarns(
-            await run(
-                { fonts: [{ provider: "fontshare", name: "Acme Sans", weights: ["400", "900"] }] },
-                { mock }
-            ),
-            /Fontshare has no 900 normal for "Acme Sans"/
-        );
-    });
-});
-
-describe("fontsource", () => {
-    const routes = (overrides = {}) =>
-        createRouteMock({
-            "/v1/fonts/acme-sans": fontsourceMeta,
-            "/v1/variable/acme-sans": { family: "Acme Sans", axes: { wght: { min: "100", max: "900" } } },
-            ...overrides,
-        });
-
-    test("builds the file urls from the catalogue metadata", async () => {
-        const mock = routes();
-        await run(
-            {
-                fonts: [
-                    {
-                        provider: "fontsource",
-                        name: "Acme Sans",
-                        weights: ["400", "700"],
-                        subsets: ["latin"],
-                    },
-                ],
-            },
-            { mock }
-        );
-
-        assert.ok(
-            mock.requests.includes(
-                "https://cdn.jsdelivr.net/fontsource/fonts/acme-sans@latest/latin-400-normal.woff2"
-            )
-        );
-        const css = await readFile(cssFile, "utf8");
-        assert.ok(css.includes("unicode-range: U+0000-00FF;"), "should reuse the api unicode range");
-    });
-
-    test("uses the variable file and its real axis for a weight range", async () => {
-        const mock = routes();
-        await run(
-            {
-                fonts: [
-                    { provider: "fontsource", name: "Acme Sans", weights: ["300 700"], subsets: ["latin"] },
-                ],
-            },
-            { mock }
-        );
-
-        assert.ok(
-            mock.requests.includes(
-                "https://cdn.jsdelivr.net/fontsource/fonts/acme-sans:vf@latest/latin-wght-normal.woff2"
-            )
-        );
-        const css = await readFile(cssFile, "utf8");
-        assert.ok(css.includes("font-weight: 100 900;"), "should declare the axis of the file");
-    });
-
-    test("keeps the configured name when id points at another family", async () => {
-        const mock = createRouteMock({
-            "/v1/fonts/acme-grotesk": { ...fontsourceMeta, id: "acme-grotesk", family: "Something Else" },
-        });
-        await run(
-            { fonts: [{ provider: "fontsource", name: "Acme Sans", id: "acme-grotesk", subsets: ["latin"] }] },
-            { mock }
-        );
-
-        const css = await readFile(cssFile, "utf8");
-        assert.ok(css.includes('font-family: "Acme Sans";'), "@font-face should use the configured name");
-        assert.ok(css.includes('--font-acme-sans: "Acme Sans", sans-serif;'));
-        assert.ok(!css.includes("Something Else"), "should not leak the catalogue name");
-    });
-
-    test("reports an unknown font id", async () => {
-        const mock = createRouteMock({ "/v1/fonts/acme-sans": 404 });
-        assertWarns(
-            await run({ fonts: [{ provider: "fontsource", name: "Acme Sans" }] }, { mock }),
-            /Fontsource has no font with the id "acme-sans", derived from "Acme Sans"/
-        );
-    });
-
-    test("reports a weight the family does not have", async () => {
-        assertWarns(
-            await run(
-                { fonts: [{ provider: "fontsource", name: "Acme Sans", weights: ["900"] }] },
-                { mock: routes() }
-            ),
-            /has no 900 weight\. Available weights: 400, 700\./
-        );
-    });
-
-    test("reports a subset the family does not have", async () => {
-        assertWarns(
-            await run(
-                { fonts: [{ provider: "fontsource", name: "Acme Sans", subsets: ["cyrillic"] }] },
-                { mock: routes() }
-            ),
-            /has no cyrillic subset\. Available subsets: latin, latin-ext\./
-        );
-    });
-
-    test("reports a weight range on a static family", async () => {
-        const mock = routes({ "/v1/fonts/acme-sans": { ...fontsourceMeta, variable: false } });
-        assertWarns(
-            await run(
-                { fonts: [{ provider: "fontsource", name: "Acme Sans", weights: ["300 700"] }] },
-                { mock }
-            ),
-            /is not a variable font, list the weights you need instead of a range/
-        );
-    });
-});
 
 describe("font-display", () => {
     test("the configured display wins over the one the endpoint returned", async () => {
@@ -856,7 +524,7 @@ describe("offline", () => {
         assert.equal(second.cached, 1);
         const css = await readFile(cssFile, "utf8");
         assert.ok(css.includes("font-display: optional;"));
-        assert.ok(css.includes('--font-acme-sans: "Acme Sans", Georgia, serif;'));
+        assert.ok(css.includes('--font-acme-sans: "Acme Sans", "Acme Sans fallback", Georgia, serif;'));
     });
 
     test("asks the provider again when a font file was deleted", async () => {
@@ -886,7 +554,7 @@ describe("offline", () => {
             requests,
             fetchImpl: async (url, options) =>
                 url.includes("family=Broken")
-                    ? { ok: false, status: 500, text: async () => "" }
+                    ? new Response("", { status: 500 })
                     : fetchImpl(url, options),
         };
         const result = await run(
@@ -918,7 +586,7 @@ describe("offline", () => {
             requests,
             fetchImpl: async (url, options) =>
                 url.includes("latin-ext")
-                    ? { ok: false, status: 503, text: async () => "" }
+                    ? new Response("", { status: 503 })
                     : fetchImpl(url, options),
         };
 
@@ -973,7 +641,7 @@ describe("preload", () => {
     });
 
     test("preloads a local font from where it actually lives", async () => {
-        await writeFile(resolve(fontsDir, "acme-icons.woff2"), "font");
+        await writeFile(resolve(fontsDir, "acme-icons.woff2"), woff2);
         await run({
             fonts: [
                 {
@@ -1233,7 +901,7 @@ describe("command output", () => {
     });
 
     test("says nothing on a run that worked", async () => {
-        await writeFile(resolve(fontsDir, "acme.woff2"), "font");
+        await writeFile(resolve(fontsDir, "acme.woff2"), woff2);
 
         const result = await runCommand({
             fonts: [{ provider: "local", name: "Acme", variants: [{ src: "acme.woff2" }] }],
@@ -1252,194 +920,8 @@ describe("command output", () => {
 });
 
 describe("fallback metrics", () => {
-    const UNITS_PER_EM = 1000;
-    const ADVANCE = 1000;
-    const GLYPHS = 92;
-
-    /** A cmap mapping every character from space to "z" onto its own glyph. */
-    const cmapTable = () => {
-        const segCount = 2;
-        const table = Buffer.alloc(16 + segCount * 8);
-        table.writeUInt16BE(4, 0);
-        table.writeUInt16BE(table.length, 2);
-        table.writeUInt16BE(segCount * 2, 6);
-        table.writeUInt16BE(0x7a, 14);
-        table.writeUInt16BE(0xffff, 16);
-        table.writeUInt16BE(0x20, 20);
-        table.writeUInt16BE(0xffff, 22);
-        table.writeInt16BE(1 - 0x20, 24);
-        table.writeInt16BE(1, 26);
-
-        const cmap = Buffer.alloc(12 + table.length);
-        cmap.writeUInt16BE(1, 2);
-        cmap.writeUInt16BE(3, 4);
-        cmap.writeUInt16BE(1, 6);
-        cmap.writeUInt32BE(12, 8);
-        table.copy(cmap, 12);
-        return cmap;
-    };
-
-    /** The tables of a font whose every glyph is exactly ADVANCE wide. */
-    const fontTables = () => {
-        const head = Buffer.alloc(54);
-        head.writeUInt16BE(UNITS_PER_EM, 18);
-
-        const hhea = Buffer.alloc(36);
-        hhea.writeInt16BE(800, 4);
-        hhea.writeInt16BE(-200, 6);
-        hhea.writeInt16BE(0, 8);
-        hhea.writeUInt16BE(GLYPHS, 34);
-
-        const hmtx = Buffer.alloc(GLYPHS * 4);
-        for (let i = 0; i < GLYPHS; i++) hmtx.writeUInt16BE(ADVANCE, i * 4);
-
-        return [
-            ["cmap", cmapTable()],
-            ["head", head],
-            ["hhea", hhea],
-            ["hmtx", hmtx],
-            ["OS/2", Buffer.alloc(96)],
-        ];
-    };
-
-    /** Pack the tables as a plain TrueType font. */
-    const buildSfnt = () => {
-        const tables = fontTables();
-        const header = Buffer.alloc(12 + tables.length * 16);
-        header.writeUInt32BE(0x00010000, 0);
-        header.writeUInt16BE(tables.length, 4);
-
-        let offset = header.length;
-        const body = [];
-        tables.forEach(([tag, data], i) => {
-            const entry = 12 + i * 16;
-            header.write(tag.padEnd(4), entry, "latin1");
-            header.writeUInt32BE(offset, entry + 8);
-            header.writeUInt32BE(data.length, entry + 12);
-            offset += data.length;
-            body.push(data);
-        });
-
-        return Buffer.concat([header, ...body]);
-    };
-
-    /** Pack the same tables as a woff2, which is what a provider serves. */
-    const buildWoff2 = () => {
-        const tables = fontTables();
-        const indexes = { cmap: 0, head: 1, hhea: 2, hmtx: 3, "OS/2": 6 };
-
-        const base128 = (value) => {
-            const bytes = [];
-            do {
-                bytes.unshift(value & 0x7f);
-                value >>>= 7;
-            } while (value);
-            for (let i = 0; i < bytes.length - 1; i++) bytes[i] |= 0x80;
-            return Buffer.from(bytes);
-        };
-
-        const directory = Buffer.concat(
-            tables.map(([tag, data]) =>
-                Buffer.concat([Buffer.from([indexes[tag]]), base128(data.length)])
-            )
-        );
-        const compressed = brotliCompressSync(
-            Buffer.concat(tables.map(([, data]) => data))
-        );
-
-        const header = Buffer.alloc(48);
-        header.write("wOF2", 0, "latin1");
-        header.writeUInt16BE(tables.length, 12);
-        header.writeUInt32BE(compressed.length, 20);
-
-        return Buffer.concat([header, directory, compressed]);
-    };
-
-    test("reads the metrics of a plain TrueType font", async () => {
-        const file = resolve(fontsDir, "synthetic.ttf");
-        await writeFile(file, buildSfnt());
-
-        assert.deepEqual(readMetrics(file), {
-            unitsPerEm: 1000,
-            ascent: 800,
-            descent: -200,
-            lineGap: 0,
-            xWidthAvg: 1000,
-        });
-    });
-
-    test("reads the metrics of a woff2, which is compressed", async () => {
-        const file = resolve(fontsDir, "synthetic.woff2");
-        await writeFile(file, buildWoff2());
-
-        assert.deepEqual(readMetrics(file), {
-            unitsPerEm: 1000,
-            ascent: 800,
-            descent: -200,
-            lineGap: 0,
-            xWidthAvg: 1000,
-        });
-    });
-
-    test("returns nothing for a file that is not a font", async () => {
-        const file = resolve(fontsDir, "not-a-font.woff2");
-        await writeFile(file, "this is not a font");
-
-        assert.equal(readMetrics(file), null);
-    });
-
-    test("prefers a named fallback over a generic one", () => {
-        assert.deepEqual(pickFallback(["Georgia", "sans-serif"]).local, ["Georgia", "Gelasio"]);
-        assert.deepEqual(pickFallback(['"Trebuchet MS"']).local, ["Trebuchet MS"]);
-    });
-
-    test("stands a representative in for a generic fallback", () => {
-        assert.equal(pickFallback(["sans-serif"]).local[0], "Arial");
-        assert.equal(pickFallback(["serif"]).local[0], "Times New Roman");
-        assert.equal(pickFallback(["ui-monospace", "monospace"]).local[0], "Courier New");
-    });
-
-    test("has nothing to match a fallback it does not know", () => {
-        assert.equal(pickFallback(["cursive"]), null);
-        assert.equal(pickFallback([]), null);
-    });
-
-    test("scales the overrides by how much wider the webfont is", async () => {
-        const file = resolve(fontsDir, "synthetic.ttf");
-        await writeFile(file, buildSfnt());
-
-        const face = buildFallbackFace(
-            { name: "Acme Sans", fallbacks: ["sans-serif"] },
-            file
-        );
-
-        // Arial averages 904 per 2048 units, the synthetic font 1000 per 1000,
-        // so it is 2.2655 times as wide and every override is divided by that.
-        assert.equal(face.family, "Acme Sans fallback");
-        assert.equal(face.sizeAdjust, "226.55%");
-        assert.equal(face.ascentOverride, "35.31%");
-        assert.equal(face.descentOverride, "8.83%");
-        assert.equal(face.lineGapOverride, "0%");
-    });
-
-    test("renders the adjusted face", () => {
-        const css = renderFallbackFace({
-            family: "Acme Sans fallback",
-            local: ["Arial", "Arimo"],
-            sizeAdjust: "107.3%",
-            ascentOverride: "90.28%",
-            descentOverride: "22.48%",
-            lineGapOverride: "0%",
-        });
-
-        assert.ok(css.includes('font-family: "Acme Sans fallback";'));
-        assert.ok(css.includes('src: local("Arial"), local("Arimo");'));
-        assert.ok(css.includes("size-adjust: 107.3%;"));
-        assert.ok(css.includes("ascent-override: 90.28%;"));
-    });
-
     test("puts the adjusted face into the stack, before the fallbacks", async () => {
-        await writeFile(resolve(fontsDir, "acme.woff2"), buildWoff2());
+        await writeFile(resolve(fontsDir, "acme.woff2"), woff2);
         await run({
             fonts: [
                 {
@@ -1457,7 +939,7 @@ describe("fallback metrics", () => {
     });
 
     test("leaves the stack alone when adjustFallback is off", async () => {
-        await writeFile(resolve(fontsDir, "acme.woff2"), buildWoff2());
+        await writeFile(resolve(fontsDir, "acme.woff2"), woff2);
         await run({
             fonts: [
                 {
@@ -1474,7 +956,7 @@ describe("fallback metrics", () => {
         assert.ok(css.includes("--font-acme: Acme, sans-serif;"));
     });
 
-    test("skips the adjusted face when the font cannot be measured", async () => {
+    test("skips the adjusted face when the font cannot be measured, and says so", async () => {
         await writeFile(resolve(fontsDir, "acme.woff2"), "not a font");
         const result = await run({
             fonts: [
@@ -1486,8 +968,20 @@ describe("fallback metrics", () => {
             ],
         });
 
-        assert.deepEqual(result.warnings, [], "an unmeasurable font is not a problem");
+        assertWarns(result, /Could not measure "Acme" for its fallback face/);
         assert.equal(result.families[0].fallbackFace, null);
         assert.ok((await readFile(cssFile, "utf8")).includes("--font-acme: Acme, sans-serif;"));
+    });
+
+    test("still removes unused font files when a font cannot be measured", async () => {
+        await writeFile(resolve(fontsDir, "acme.woff2"), "not a font");
+        await mkdir(generatedDir, { recursive: true });
+        await writeFile(resolve(generatedDir, "old-font.woff2"), "stale");
+
+        const result = await run({
+            fonts: [{ provider: "local", name: "Acme", variants: [{ src: "acme.woff2" }] }],
+        });
+
+        assert.deepEqual(result.removed, ["old-font.woff2"], "the files it needs are still known");
     });
 });

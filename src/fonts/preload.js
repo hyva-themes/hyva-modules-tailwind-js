@@ -33,19 +33,21 @@ export const escapeXml = (value) =>
  * Render the font elements for every family that asked to be preloaded, one
  * comment naming the family followed by its files.
  *
- * @param {Object[]} families - Resolved families, with `files` relative to
+ * @param {{ family: string, file: string }[]} preloads - Files relative to
  *        the theme's "web/fonts" folder.
  * @returns {string[]} lines, without indentation
  */
-export function fontElements(families) {
-    return families
-        .filter((family) => family.preload && family.faces.length)
-        .flatMap((family) => [
-            `<!-- ${family.name} -->`,
-            ...[...new Set(family.faces.flatMap((face) => face.files))].map(
-                (file) => `<font src="fonts/${escapeXml(file)}"/>`
-            ),
-        ]);
+export function fontElements(preloads) {
+    const files = new Map();
+    for (const { family, file } of preloads) {
+        if (!files.has(family)) files.set(family, new Set());
+        files.get(family).add(file);
+    }
+
+    return [...files].flatMap(([family, sources]) => [
+        `<!-- ${family} -->`,
+        ...[...sources].map((file) => `<font src="fonts/${escapeXml(file)}"/>`),
+    ]);
 }
 
 /**
@@ -56,12 +58,12 @@ export function fontElements(families) {
  * `as="font"` and `crossorigin="anonymous"`. That last one matters: a font
  * preloaded without it is fetched a second time when the @font-face uses it.
  *
- * @param {Object[]} families - Resolved families, with `files` relative to
+ * @param {{ family: string, file: string }[]} preloads - Files relative to
  *        the theme's "web/fonts" folder.
  * @returns {string|null} XML, or null when there is nothing to preload
  */
-export function renderPreloadXml(families) {
-    const lines = fontElements(families);
+export function renderPreloadXml(preloads) {
+    const lines = fontElements(preloads);
     if (!lines.length) return null;
 
     const elements = lines.map((line) => `        ${line}`).join("\n");
