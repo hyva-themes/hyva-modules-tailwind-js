@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.6.0] - 2026-11-23
+## [1.6.0] - 2026-11-24
 
 ### Added
 
@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     The generated CSS and font files are the same, and an existing
     `hyva-fonts.json` is reused, so a theme needs no new download.
 
--   Requires Node 22 or newer, which `@fylgja/fonts-provider` needs.
+-   Requires Node 22 or newer, as Node 20 reached its end of life in April 2026.
 
 -   The `fonts` configuration is validated more strictly. Every option must
     have the right type, so `"preload": "true"` is now an error, and every value
